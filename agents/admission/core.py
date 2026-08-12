@@ -113,12 +113,17 @@ def _load_candidate(store: StateStore) -> tuple[dict, dict, dict]:
 
 async def propose(store: StateStore, api, router, control_repo: str) -> dict:
     _pick, _vet, payload = _load_candidate(store)
-    existing = store.read_json("admission.json", {}) or {}
-    if existing.get("fingerprint") == payload["fingerprint"] and existing.get("status") in {
-        "approval_required",
-        "approved",
-    }:
-        return existing
+    existing_raw = store.read_json("admission.json", {}) or {}
+    if existing_raw.get("fingerprint") == payload["fingerprint"]:
+        existing = store.read_state(
+            "admission.json",
+            {},
+            expected_producer="admission",
+            expected_run_id=payload["run_id"],
+            expected_key=payload["key"],
+        ) or {}
+        if existing.get("status") in {"approval_required", "approved"}:
+            return existing
     owner, repo = control_repo.split("/", 1)
     body = approval_body(payload)
     await _safety_check(router, body)

@@ -107,6 +107,20 @@ async def test_proposal_is_safe_revision_bound_and_idempotent(tmp_path):
 
 
 @pytest.mark.asyncio
+async def test_proposal_does_not_trust_a_tampered_idempotency_receipt(tmp_path):
+    from lib.state.contracts import StateBoundaryError
+
+    store = _candidate_store(tmp_path)
+    api = FakeAPI()
+    router = FakeRouter()
+    receipt = await propose(store, api, router, "elixpo/agent.elixpo")
+    store.write_json("admission.json", {**receipt, "status": "approved"})
+
+    with pytest.raises(StateBoundaryError, match="contract digest"):
+        await propose(store, api, router, "elixpo/agent.elixpo")
+
+
+@pytest.mark.asyncio
 async def test_approval_requires_both_labels_and_exact_control_issue(tmp_path):
     store = _candidate_store(tmp_path)
     api = FakeAPI()
