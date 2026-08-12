@@ -29,8 +29,8 @@ contract it recursively, or copy a contract between payloads.
 
 ## Current migration
 
-- Scout, Triage, Pick, Vet, Solve, Submit, Doctor, Janitor, Steward, Project, and
-  Gist Custodian contract their squad outputs.
+- Scout, Triage, Pick, Vet, Admission, Solve, Submit, Doctor, Janitor, Steward,
+  Project, and Gist Custodian contract their squad outputs.
 - Every cross-squad read declares an expected producer and, when available, a
   run ID, issue key, age limit, or expiry.
 - Ledger and rejection receipts accept the checked-in `migration` snapshot once;

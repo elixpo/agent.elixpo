@@ -1,14 +1,11 @@
 name: solve
 
-# Vet-approved production targets flow through Solve and Submit in one isolated
-# runner so the local fork workspace never becomes cross-workflow state.
+# Maintainer-approved production targets flow through Solve and Submit in one
+# isolated runner so the local fork workspace never becomes cross-workflow state.
 
 on:
   repository_dispatch:
-    types: [doctor_retry]
-  workflow_run:
-    workflows: [vet]
-    types: [completed]
+    types: [doctor_retry, oreoflow_approved]
   workflow_dispatch:
     inputs:
       issue_url:
@@ -34,7 +31,7 @@ concurrency:
 
 jobs:
   solve:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -48,6 +45,7 @@ jobs:
           ISSUE_URL: ${{ inputs.issue_url }}
           OWNED_TEST: ${{ inputs.owned_test }}
           WANT_SUBMIT: ${{ inputs.submit }}
+          DISPATCH_TYPE: ${{ github.event.action }}
           RETRY_FINGERPRINT: ${{ github.event.client_payload.fingerprint }}
         run: |
           run=false
@@ -58,16 +56,22 @@ jobs:
             fi
             submit="${WANT_SUBMIT:-true}"
           elif [[ "$EVENT_NAME" == "repository_dispatch" ]]; then
-            if jq -e --arg fingerprint "$RETRY_FINGERPRINT" \
-              '.status == "decided" and .current.action == "retry" and .current.failure_fingerprint == $fingerprint and .current.retry_count == 1' \
-              state/doctor.json >/dev/null \
+            admission_ready=false
+            if jq -e '.status == "approved"' state/admission.json >/dev/null \
               && jq -e '.status == "picked" and .picked == true' state/pick.json >/dev/null \
               && jq -e '.status == "approved" and .suitable == true and .test_mode != true' state/vet.json >/dev/null; then
+              admission_ready=true
+            fi
+            if [[ "$DISPATCH_TYPE" == "oreoflow_approved" && "$admission_ready" == "true" ]] \
+              && jq -e --arg fingerprint "$RETRY_FINGERPRINT" \
+                '.fingerprint == $fingerprint' state/admission.json >/dev/null; then
+              run=true
+            elif [[ "$DISPATCH_TYPE" == "doctor_retry" && "$admission_ready" == "true" ]] \
+              && jq -e --arg fingerprint "$RETRY_FINGERPRINT" \
+                '.status == "decided" and .current.action == "retry" and .current.failure_fingerprint == $fingerprint and .current.retry_count == 1' \
+                state/doctor.json >/dev/null; then
               run=true
             fi
-          elif jq -e '.status == "picked" and .picked == true' state/pick.json >/dev/null \
-            && jq -e '.status == "approved" and .suitable == true and .test_mode != true' state/vet.json >/dev/null; then
-            run=true
           fi
           echo "run=$run" >> "$GITHUB_OUTPUT"
           echo "submit=$submit" >> "$GITHUB_OUTPUT"

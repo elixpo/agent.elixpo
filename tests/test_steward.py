@@ -78,6 +78,18 @@ def test_followup_memory_bounds_ttl_and_tracks_completion():
     assert memory.completed[-1].subject_url.endswith("/pull/12")
 
 
+def test_followup_factory_accepts_notification_status():
+    record = FollowupRecord.create(
+        repository="elixpo/project",
+        subject_kind="issue",
+        subject_number=9,
+        subject_url="https://github.com/elixpo/project/issues/9",
+        status="mention_received",
+    )
+
+    assert record.status == "mention_received"
+
+
 def test_followup_memory_prunes_expired_records():
     now = datetime(2026, 8, 4, tzinfo=timezone.utc)
     record = FollowupRecord.create(

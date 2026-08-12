@@ -21,6 +21,13 @@ validates both labels, the embedded source identity, and the matching pending
 Gist record before posting one response. Closing the request without approval
 denies it.
 
+Implementation requests have a second, independent boundary. Trusted mentions
+and autonomous Scout candidates both enter Pick → Vet. A successful Vet creates
+one `oreoflow/approval-required` control issue bound to the issue revision and
+run ID. Adding `oreoflow/approved` starts Solve; Vet success alone cannot mutate
+the target repository. This keeps trusted nominations convenient without giving
+mentions or model output direct execution authority.
+
 The reviewed control-repository policy lives in
 `.github/elixpoo-whitelist.yml`. Add external repositories under
 `watched_repositories` using exact `owner/repository` names. A malformed schema,

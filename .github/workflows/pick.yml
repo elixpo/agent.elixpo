@@ -4,6 +4,9 @@ name: pick
 # claim only after final suitability approval.
 
 on:
+  workflow_run:
+    workflows: [triage]
+    types: [completed]
   schedule:
     - cron: "0 9 * * *" # daily, 09:00 UTC (after scout+triage at 06:00)
   workflow_dispatch: {}
@@ -18,6 +21,7 @@ concurrency:
 jobs:
   pick:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v4
         with:

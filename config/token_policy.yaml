@@ -2,6 +2,7 @@ schema_version: 1
 restricted_secrets:
   ELIXPOO_GITHUB_AGENTIC_TOKEN:
     - artifact-update.yml
+    - admission.yml
     - daily-summary.yml
     - elixpo-agent.yml
     - elixpo-triage.yml
@@ -25,6 +26,7 @@ restricted_secrets:
     - triage.yml
     - vet.yml
   ELIXPO_POLLINATIONS_API_KEY:
+    - admission.yml
     - discussions.yml
     - elixpo-agent.yml
     - elixpo-ci.yml

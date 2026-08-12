@@ -322,6 +322,7 @@ def test_snapshot_prefers_live_solve_and_doctor_evidence():
         doctor={"key": "elixpo/project#9", "current": {"reason": "provider unavailable"}},
         janitor={},
         steward_fix={},
+        admission={},
     )
 
     assert snapshot.status == "cleanup pending"
@@ -340,6 +341,22 @@ def test_project_reads_only_contracted_operational_state(tmp_path):
     solve = {"status": "running", "run_id": "run-1", "key": "elixpo/project#9"}
     store.write_state("solve.json", solve, producer="solve")
     assert current_states(store)["solve"] == solve
+
+
+def test_project_treats_expired_operational_receipt_as_not_live(tmp_path):
+    from datetime import datetime, timedelta, timezone
+
+    store = StateStore(tmp_path)
+    now = datetime(2026, 8, 12, tzinfo=timezone.utc)
+    store.write_state(
+        "pick.json",
+        {"status": "no_pick"},
+        producer="pick",
+        ttl=timedelta(hours=1),
+        now=now - timedelta(hours=2),
+    )
+
+    assert current_states(store)["pick"] == {}
 
 
 @pytest.mark.asyncio

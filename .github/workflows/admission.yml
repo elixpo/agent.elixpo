@@ -1,0 +1,97 @@
+name: admission
+
+# Successful autonomous and trusted-nomination Vet runs converge here. An
+# approved Vet verdict creates one revision-bound control issue. Solve starts
+# only after a maintainer adds the oreoflow/approved label to that issue.
+
+on:
+  workflow_run:
+    workflows: [vet]
+    types: [completed]
+  issues:
+    types: [labeled]
+  workflow_dispatch: {}
+
+permissions:
+  actions: write
+  contents: write
+  issues: write
+
+concurrency:
+  group: state-write
+  cancel-in-progress: false
+
+jobs:
+  propose:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.ELIXPOO_GITHUB_AGENTIC_TOKEN }}
+      - name: Check for an approved Vet candidate
+        id: gate
+        run: |
+          ready=false
+          if jq -e '.status == "approved" and .suitable == true and .test_mode != true' state/vet.json >/dev/null \
+            && jq -e '.status == "picked" and .picked == true' state/pick.json >/dev/null; then
+            ready=true
+          fi
+          echo "ready=$ready" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-python@v5
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          python-version: "3.11"
+      - name: Install
+        if: steps.gate.outputs.ready == 'true'
+        run: pip install -e .
+      - name: Open an approval issue
+        if: steps.gate.outputs.ready == 'true'
+        env:
+          ELIXPOO_GITHUB_AGENTIC_TOKEN: ${{ secrets.ELIXPOO_GITHUB_AGENTIC_TOKEN }}
+          ELIXPO_GITHUB_CONTROL_REPO: ${{ github.repository }}
+          ELIXPO_POLLINATIONS_API_KEY: ${{ secrets.ELIXPO_POLLINATIONS_API_KEY }}
+        run: python -m agents.admission propose
+      - name: Commit admission receipt
+        if: steps.gate.outputs.ready == 'true'
+        run: |
+          git config user.name "elixpoo"
+          git config user.email "elixpoo@gmail.com"
+          git add state/admission.json state/contracts.json
+          git diff --cached --quiet || git commit -m "chore(admission): request maintainer approval"
+          git push
+
+  approve:
+    if: ${{ github.event_name == 'issues' && github.event.label.name == 'oreoflow/approved' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.ELIXPOO_GITHUB_AGENTIC_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: pip install -e .
+      - name: Validate exact admission
+        env:
+          ELIXPOO_GITHUB_AGENTIC_TOKEN: ${{ secrets.ELIXPOO_GITHUB_AGENTIC_TOKEN }}
+          ELIXPO_GITHUB_CONTROL_REPO: ${{ github.repository }}
+        run: python -m agents.admission approve --issue-number "${{ github.event.issue.number }}"
+      - name: Commit approval receipt
+        run: |
+          git config user.name "elixpoo"
+          git config user.email "elixpoo@gmail.com"
+          git add state/admission.json state/contracts.json
+          git diff --cached --quiet || git commit -m "chore(admission): authorize implementation"
+          git push
+      - name: Start the approved Solve run
+        env:
+          GH_TOKEN: ${{ secrets.ELIXPOO_GITHUB_AGENTIC_TOKEN }}
+        run: |
+          fingerprint=$(jq -r '.fingerprint' state/admission.json)
+          gh api --method POST "repos/${{ github.repository }}/dispatches" \
+            -f event_type=oreoflow_approved \
+            -F "client_payload[fingerprint]=$fingerprint"

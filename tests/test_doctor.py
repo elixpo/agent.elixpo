@@ -135,7 +135,7 @@ def test_doctor_records_idempotent_state_and_authorizes_janitor(tmp_path):
 def test_solve_workflow_runs_recovery_on_the_same_runner_and_bounds_retry():
     workflow = Path(".github/workflows/solve.yml").read_text(encoding="utf-8")
 
-    assert "types: [doctor_retry]" in workflow
+    assert "types: [doctor_retry, oreoflow_approved]" in workflow
     assert "python -m agents.doctor" in workflow
     assert "python -m agents.janitor" in workflow
     assert "steps.solve.outcome == 'failure'" in workflow
