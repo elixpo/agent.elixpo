@@ -11,20 +11,24 @@ source of truth for review and version control.
 ## What is released
 
 `agent.elixpo` publishes the Python distribution **`elixpoo`**. Applications use
-its stable import namespace **`oreoflow`**. Version `v1.2.1` exposes the model
-runtime used by Elixpo agents; it is not yet the complete multi-agent building
-planned in [ecosystem-framework.md](ecosystem-framework.md).
+its stable import namespace **`oreoflow`**. Version `v1.3.0` combines the typed
+model runtime with stable multi-agent control-plane contracts. It is designed
+for agents that cross process, workflow, or provider boundaries without giving
+model output implicit authority.
 
 ```text
 application agent
-  ├─ owns prompts, skills, tool execution, sessions, memory and orchestration
-  └─ oreoflow public API
-       └─ rtk implementation
+  ├─ owns domain prompts, skills, tools and durable storage adapters
+  └─ oreoflow SDK
+       ├─ AgentCard + Capability + AgentRegistry
+       ├─ Room + Task + integrity-checked A2AMessage + ArtifactRef
+       ├─ PolicyGrant + deterministic authorization
+       └─ Router + Budget + TokenLedger
             └─ OpenAI-compatible /chat/completions provider
 ```
 
 The stable namespace prevents applications from depending directly on internal
-`rtk` modules. In `v1.2.1`, it exports:
+`rtk` modules. In `v1.3.0`, it exports the existing model-runtime surface:
 
 | Export | Contract |
 | --- | --- |
@@ -41,6 +45,26 @@ The stable namespace prevents applications from depending directly on internal
 | `RoleNotFound` | Raised when a requested role is absent. |
 | `load_models_config` | Loads a role/model YAML document. |
 
+Control-plane exports:
+
+| Export | Contract |
+| --- | --- |
+| `AgentCard`, `Capability` | Versioned identity, work, scopes, budgets and public-action declarations. |
+| `AgentRegistry` | Deterministic capability routing with policy enforcement. |
+| `Room` | One isolated objective, participant set, token budget and timeout. |
+| `Task`, `TaskState` | Validated lifecycle whose terminal states cannot be reopened. |
+| `A2AMessage`, `Endpoint` | Portable OreoFlow envelope with causal identity and SHA-256 integrity. |
+| `ArtifactRef` | Immutable content-addressed output metadata. |
+| `PolicyGrant` | Explicit scopes, delegation depth and public-action approval. |
+| `LocalCoordinator` | Small in-process dispatcher; durable stores and transports remain adapters. |
+| `MessageStore`, `Transport` | Protocols for GitHub, queue, HTTP or other runtime adapters. |
+| `new_id` | Sortable opaque IDs that carry no authorization. |
+| `schema_bundle` | JSON Schemas for all portable control-plane records. |
+
+OreoFlow borrows Task/Message/Artifact semantics from agent-to-agent systems,
+but `oreoflow.a2a/v1` is an OreoFlow profile. It does not claim official A2A
+protocol conformance.
+
 `rtk` remains importable for the agent repository itself, but it is not the
 application compatibility boundary.
 
@@ -50,7 +74,7 @@ Released tag:
 
 ```bash
 python -m pip install \
-  "git+https://github.com/elixpo/agent.elixpo.git@v1.2.1"
+  "git+https://github.com/elixpo/agent.elixpo.git@v1.3.0"
 ```
 
 Sibling development checkout:
@@ -168,6 +192,83 @@ tool = ToolDef.model_validate({
 A role may specify `tools: false`; the router then removes supplied tools for
 that role. This is used for provider-native search and safety routes.
 
+## Build a policy-bound agent
+
+An agent begins with a card. The card says what it can do; a task says what
+should be done; a grant says what this invocation may do. Capability names,
+not Python module names, are the routing boundary.
+
+```python
+from oreoflow import AgentCard, Capability, AgentRegistry, PolicyGrant
+
+writer = AgentCard(
+    name="blog_writer",
+    description="Draft repository-grounded technical posts",
+    version="1.0.0",
+    floor="publishing",
+    capabilities=(Capability(
+        name="blog.draft",
+        description="Create one Markdown draft",
+        required_scopes=("content:read",),
+    ),),
+    model_role="prose",
+    default_token_budget=8_000,
+)
+
+registry = AgentRegistry([writer])
+selected = registry.route(
+    "blog.draft",
+    PolicyGrant(scopes=frozenset({"content:read"})),
+)
+```
+
+Public capabilities set `public_action=True`. They route only when the grant
+also contains `public_action=True` and `approved=True`. A model cannot mint that
+grant; the embedding application or operator does.
+
+## Tasks, messages and artifacts
+
+```python
+from datetime import datetime, timedelta, timezone
+from oreoflow import A2AMessage, BudgetGrant, Endpoint, PolicyGrant, Task
+
+task = Task(capability="blog.draft", input={"topic": "GitOps rollbacks"})
+message = A2AMessage(
+    building_id="my-agents",
+    source=Endpoint(floor="intake", room="room_1", agent="router"),
+    destination=Endpoint(floor="publishing", room="room_2", agent="blog_writer"),
+    kind="task.request",
+    task_id=task.task_id,
+    capability=task.capability,
+    deadline=datetime.now(timezone.utc) + timedelta(minutes=10),
+    budget=BudgetGrant(tokens=8_000, seconds=600),
+    policy=PolicyGrant(scopes=frozenset({"content:read"})),
+    payload=task.input,
+).seal()
+
+assert message.verify()
+```
+
+Messages are limited to 64 KiB. Large results travel as `ArtifactRef` values;
+consumers verify their SHA-256 and byte size before use. This keeps transports
+cheap and makes cross-agent inputs auditable.
+
+## Coordinator and adapters
+
+`LocalCoordinator` binds cards to async handlers and dispatches only sealed,
+identity-matching, policy-authorized tasks. It is intentionally small. A hosted
+runtime implements `MessageStore.put_if_absent()` for idempotency and
+`Transport.send()` for delivery. GitHub Issues, Actions, Redis, SQS, HTTP and an
+in-memory test transport can implement those protocols without changing an
+agent card or handler.
+
+The complete no-network blogging example is
+[`examples/blog_agent.py`](../examples/blog_agent.py):
+
+```bash
+python examples/blog_agent.py
+```
+
 ## Budgets and ledgers
 
 ```python
@@ -242,16 +343,17 @@ Both `AgentRunner._call()` and `AgentRunner._stream_call()` construct the router
 with `POLLINATIONS_API_KEY`, use the role/model selected from Search's local
 configuration, and close it in `finally`.
 
-## What v1.2.1 does not provide
+## What v1.3.0 does not provide
 
 Do not treat these as implemented framework features yet:
 
-- multi-agent scheduling, delegation, rooms/floors or A2A transport;
+- an always-on scheduler, hosted queue, official A2A server, or distributed lease service;
 - a skill registry or tool executor;
 - Redis/Qdrant memory and OpenAI conversation state;
 - image, PDF, browser or web-search tool implementations;
 - application HTTP endpoints, SSE buffering or client authentication;
-- a globally shared long-lived router service across processes.
+- a globally shared long-lived router service across processes;
+- authorization derived from agent/model output—grants come from trusted application policy.
 
 Those remain application responsibilities or roadmap items. Keeping this line
 clear prevents framework code from coupling itself to Search deployment state.

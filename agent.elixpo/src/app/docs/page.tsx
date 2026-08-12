@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import {
   ArrowRight,
   BookOpen,
@@ -23,6 +25,7 @@ import {
   Zap,
 } from "lucide-react";
 import { CodeBlock } from "@/components/code-block";
+import { CopyDocumentation } from "@/components/copy-documentation";
 import { pageMetadata } from "@/lib/site-metadata";
 
 export const metadata: Metadata = pageMetadata(
@@ -40,12 +43,20 @@ const publicApi = [
   ["LLMClient", "Low-level asynchronous OpenAI-compatible HTTP client with retries."],
   ["Usage", "Prompt, cached, completion, and total token accounting."],
   ["Effort", "Low, medium, or high effort mapped to controlled temperatures."],
+  ["AgentCard", "Versioned identity, capabilities, scopes, budgets, and public actions."],
+  ["AgentRegistry", "Deterministic capability routing guarded by policy grants."],
+  ["A2AMessage", "Causal, budgeted, integrity-checked cross-agent envelope."],
+  ["Task", "Validated lifecycle with protected terminal states."],
+  ["ArtifactRef", "Content-addressed output metadata with SHA-256 verification."],
+  ["LocalCoordinator", "Embeddable dispatcher with adapter-owned persistence."],
 ];
 
 const ownership = [
   ["Provider HTTP, retries, validation", "OreoFlow"],
   ["Logical role → model", "OreoFlow + application YAML"],
   ["Streaming provider chunks", "OreoFlow"],
+  ["Cards, tasks, message integrity", "OreoFlow"],
+  ["Capability and public-action policy", "OreoFlow"],
   ["Agent selection and prompts", "Application"],
   ["Skills and tool execution", "Application"],
   ["Sessions and response IDs", "Application"],
@@ -61,6 +72,7 @@ const sections = [
   ["api", "Public API"],
   ["calls", "Calls & streaming"],
   ["tools", "Tools"],
+  ["agents", "Agents & A2A"],
   ["budgets", "Budgets"],
   ["search", "Search integration"],
   ["responses", "Responses effort"],
@@ -77,10 +89,11 @@ function SectionTitle({ eyebrow, title, children }: { eyebrow: string; title: st
 }
 
 export default function DocsPage() {
+  const frameworkMarkdown = readFileSync(resolve(process.cwd(), "../docs/oreoflow-framework.md"), "utf8");
   return (
     <main className="docs-page">
       <aside className="docs-sidebar">
-        <div className="docs-sidebar-head"><Library size={18} /><span><strong>OreoFlow</strong><small>Framework v1.2.1</small></span></div>
+        <div className="docs-sidebar-head"><Library size={18} /><span><strong>OreoFlow</strong><small>Framework v1.3.0</small></span></div>
         <nav aria-label="Framework documentation">
           {sections.map(([id, label]) => <a href={`#${id}`} key={id}>{label}</a>)}
         </nav>
@@ -93,10 +106,11 @@ export default function DocsPage() {
         <section className="docs-hero" id="overview">
           <div className="docs-kicker"><BookOpen size={15} /> Developer documentation</div>
           <h1>Build agents on the<br /><em>OreoFlow runtime.</em></h1>
-          <p>A small, typed Python boundary for model routing, OpenAI-compatible calls, streaming, tool schemas, budgets, and usage accounting.</p>
+          <p>A typed Python SDK for policy-bound agents: capability routing, rooms, tasks, integrity-checked messages, artifacts, model calls, budgets, and usage accounting.</p>
           <div className="docs-actions">
-            <a href="#install">Install v1.2.1 <ArrowRight size={15} /></a>
+            <a href="#install">Install v1.3.0 <ArrowRight size={15} /></a>
             <a className="docs-action-secondary" href="https://github.com/elixpo/agent.elixpo" target="_blank" rel="noreferrer">View source <ExternalLink size={14} /></a>
+            <CopyDocumentation content={frameworkMarkdown} />
           </div>
           <div className="docs-facts">
             <span><Check size={14} /> Python 3.11+</span><span><Check size={14} /> Async-first</span><span><Check size={14} /> OpenAI-compatible</span><span><Check size={14} /> MIT</span>
@@ -104,12 +118,12 @@ export default function DocsPage() {
         </section>
 
         <section className="docs-section" id="architecture">
-          <SectionTitle eyebrow="Mental model" title="A stable runtime boundary">Applications own agent behavior. OreoFlow owns the model-facing mechanics that every agent otherwise repeats.</SectionTitle>
+          <SectionTitle eyebrow="Mental model" title="One policy-bound agent SDK">Applications own domain behavior and adapters. OreoFlow owns identity, routing, lifecycle, integrity, policy, budgets, and model mechanics.</SectionTitle>
           <div className="docs-flow" aria-label="OreoFlow architecture flow">
-            <div><Boxes size={21} /><strong>Application agent</strong><small>prompts · skills · memory</small></div><ArrowRight />
-            <div><Library size={21} /><strong>oreoflow</strong><small>stable public API</small></div><ArrowRight />
-            <div><Route size={21} /><strong>Router</strong><small>role · budget · ledger</small></div><ArrowRight />
-            <div><Radio size={21} /><strong>Provider</strong><small>/chat/completions</small></div>
+            <div><Boxes size={21} /><strong>Application</strong><small>skills · tools · adapters</small></div><ArrowRight />
+            <div><Library size={21} /><strong>Cards & tasks</strong><small>capability · policy · room</small></div><ArrowRight />
+            <div><Route size={21} /><strong>Messages</strong><small>causality · budget · integrity</small></div><ArrowRight />
+            <div><Radio size={21} /><strong>Runtime</strong><small>coordinator · Router</small></div>
           </div>
           <div className="docs-note"><ShieldCheck size={18} /><p><strong>Compatibility rule</strong>Consumer applications import from <code>oreoflow</code>, not internal <code>rtk</code> modules. Internal code can evolve without breaking application imports.</p></div>
         </section>
@@ -117,7 +131,7 @@ export default function DocsPage() {
         <section className="docs-section" id="install">
           <SectionTitle eyebrow="01 · Install" title="Pin the released framework">Use the Git tag in production and an editable sibling checkout while developing both repositories.</SectionTitle>
           <div className="docs-two-code">
-            <div><h3><GitBranch size={16} /> Released tag</h3><Code language="shell" title="Install from GitHub release">{`python -m pip install \\\n  "git+https://github.com/elixpo/agent.elixpo.git@v1.2.1"`}</Code></div>
+            <div><h3><GitBranch size={16} /> Released tag</h3><Code language="shell" title="Install from GitHub release">{`python -m pip install \\\n  "git+https://github.com/elixpo/agent.elixpo.git@v1.3.0"`}</Code></div>
             <div><h3><FileCode2 size={16} /> Local development</h3><Code language="shell" title="Editable checkout">{`python -m pip install -e ../agent.elixpo`}</Code></div>
           </div>
           <p className="docs-prose">The distribution name is <code>elixpoo</code>. The supported application import is <code>oreoflow</code>. Search&apos;s Docker build installs the sibling repository through a named BuildKit context.</p>
@@ -138,7 +152,7 @@ roles:
         </section>
 
         <section className="docs-section" id="api">
-          <SectionTitle eyebrow="03 · Reference" title="The v1.2.1 public surface">These names are re-exported from <code>oreoflow</code> and form the current compatibility contract.</SectionTitle>
+          <SectionTitle eyebrow="03 · Reference" title="The v1.3.0 public surface">These names are re-exported from <code>oreoflow</code> and form the current compatibility contract.</SectionTitle>
           <div className="docs-api-grid">{publicApi.map(([name, description]) => <div key={name}><code>{name}</code><p>{description}</p></div>)}</div>
         </section>
 
@@ -193,8 +207,34 @@ asyncio.run(main())`}</Code>
           <div className="docs-steps"><div><b>1</b><span><strong>Receive</strong><small>Inspect returned tool calls</small></span></div><div><b>2</b><span><strong>Authorize</strong><small>Apply app policy and scopes</small></span></div><div><b>3</b><span><strong>Execute</strong><small>Run the implementation</small></span></div><div><b>4</b><span><strong>Continue</strong><small>Append result and call again</small></span></div></div>
         </section>
 
+        <section className="docs-section" id="agents">
+          <SectionTitle eyebrow="06 · Coordinate" title="Cards, tasks and trusted envelopes">Route by declared capability. Keep authority in explicit grants, bind every request to a task, and seal cross-agent messages before delivery.</SectionTitle>
+          <Code language="python" title="blog_agent.py">{`from oreoflow import (
+    AgentCard, AgentRegistry, Capability, PolicyGrant, Task
+)
+
+writer = AgentCard(
+    name="blog_writer",
+    description="Draft repository-grounded technical posts",
+    version="1.0.0",
+    floor="publishing",
+    capabilities=(Capability(
+        name="blog.draft",
+        description="Create one Markdown draft",
+        required_scopes=("content:read",),
+    ),),
+    model_role="prose",
+)
+registry = AgentRegistry([writer])
+grant = PolicyGrant(scopes=frozenset({"content:read"}))
+task = Task(capability="blog.draft", input={"topic": "GitOps"})
+selected = registry.route(task.capability, grant)`}</Code>
+          <div className="docs-note"><ShieldCheck size={18} /><p><strong>Authority does not come from the model</strong>A capability marked <code>public_action=True</code> requires an externally issued grant with <code>public_action=True</code> and <code>approved=True</code>.</p></div>
+          <p className="docs-prose"><code>oreoflow.a2a/v1</code> maps Task, Message, and Artifact concepts into an integrity-checked OreoFlow profile. It does not claim official A2A conformance.</p>
+        </section>
+
         <section className="docs-section" id="budgets">
-          <SectionTitle eyebrow="06 · Control" title="Bound every model task">The soft limit is visible to the application; the multiplied hard ceiling is the runaway kill switch.</SectionTitle>
+          <SectionTitle eyebrow="07 · Control" title="Bound every model task">The soft limit is visible to the application; the multiplied hard ceiling is the runaway kill switch.</SectionTitle>
           <div className="docs-control-grid"><div><Gauge /><strong>Soft budget</strong><p><code>remaining()</code> reports capacity. Crossing the soft limit is advisory.</p></div><div><ShieldCheck /><strong>Hard ceiling</strong><p>A pre-call estimate past <code>limit × kill_multiple</code> raises <code>BudgetExceeded</code>.</p></div><div><CircleDollarSign /><strong>Token ledger</strong><p>Completed calls append model, role, cached, prompt, completion, and total usage to JSONL.</p></div></div>
           <Code language="python" title="Budget and ledger">{`budget = Budget("task-42", limit=10_000, kill_multiple=3)
 ledger = TokenLedger("state/token_log.jsonl")
@@ -221,11 +261,11 @@ router = Router("task-42", models=models, api_key=key,
         </section>
 
         <section className="docs-section" id="boundaries">
-          <SectionTitle eyebrow="Honest boundary" title="What v1.2.1 does not provide">These remain application responsibilities or roadmap work—not hidden framework features.</SectionTitle>
+          <SectionTitle eyebrow="Honest boundary" title="What v1.3.0 does not provide">These remain application responsibilities or adapter work—not hidden framework features.</SectionTitle>
           <ul className="docs-no-list">
             {[
-              "Multi-agent scheduling, rooms, floors, delegation, or A2A transport",
-              "A skill registry, policy engine, or tool executor",
+              "An always-on scheduler, hosted queue, official A2A server, or distributed leases",
+              "A skill registry or tool executor",
               "Redis/Qdrant memory and OpenAI conversation persistence",
               "Image, PDF, browser, or web-search implementations",
               "HTTP endpoints, SSE batching, or public client authentication",
@@ -244,7 +284,7 @@ python examples/raw_oreoflow.py \\\n  --role prose --live --stream \\\n  --env-f
 python tester/raw_agent_runtime.py \\\n  --agent coding \\\n  --effort medium \\\n  --live --stream \\\n  --prompt "Write a URL validator"`}</Code></div></div>
         </section>
 
-        <footer className="docs-footer"><Braces size={18} /><span><strong>OreoFlow v1.2.1</strong><small>Source contracts over marketing claims.</small></span><a href="https://github.com/elixpo/agent.elixpo" target="_blank" rel="noreferrer">GitHub <ExternalLink size={13} /></a></footer>
+        <footer className="docs-footer"><Braces size={18} /><span><strong>OreoFlow v1.3.0</strong><small>Source contracts over marketing claims.</small></span><a href="https://github.com/elixpo/agent.elixpo" target="_blank" rel="noreferrer">GitHub <ExternalLink size={13} /></a></footer>
       </article>
     </main>
   );

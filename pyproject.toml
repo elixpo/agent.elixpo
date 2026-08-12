@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "elixpoo"
-version = "1.2.1"
-description = "elixpoo — autonomous GitHub-contributor agent (modular squads over Pollinations)"
+version = "1.3.0"
+description = "OreoFlow — policy-bound multi-agent control plane and model runtime"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"

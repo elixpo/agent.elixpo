@@ -1,6 +1,6 @@
 {
   "name": "@elixpo/agent.elixpo",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "private": true,
   "description": "OreoFlow live agent operations dashboard and framework documentation.",
   "license": "MIT",
