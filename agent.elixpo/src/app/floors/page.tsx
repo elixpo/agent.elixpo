@@ -3,7 +3,7 @@ import { pageMetadata } from "@/lib/site-metadata";
 
 export const metadata = pageMetadata(
   "Agent Floor Directory",
-  "Explore OreoFlow's operations lobby, autonomous GitHub workflow floor, and community discussions floor.",
+  "Explore Elixpoo's repository activity, project-management workflow floor, and canonical community Discussions floor.",
   "/floors",
 );
 

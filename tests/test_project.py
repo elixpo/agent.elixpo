@@ -418,12 +418,11 @@ async def test_reconcile_isolates_one_project_item_failure(tmp_path, monkeypatch
     assert result["failures"] == [{"key": "elixpo/project#10", "error": "field unavailable"}]
 
 
-def test_project_workflow_and_docs_define_recovery_and_dedicated_token():
-    workflow = Path(".github/workflows/project.yml").read_text(encoding="utf-8")
-    docs = Path("docs/project-operations.md").read_text(encoding="utf-8")
+def test_v1_triage_uses_dedicated_project_token():
+    workflow = Path(".github/workflows/elixpoo-triage-reusable.yml").read_text(encoding="utf-8")
+    docs = Path("docs/elixpoo-v1.md").read_text(encoding="utf-8")
 
-    assert 'cron: "*/15 * * * *"' in workflow
+    assert "workflow_call:" in workflow
     assert "ELIXPOO_GITHUB_PROJECT_TOKEN" in workflow
-    assert "group: state-write" in workflow
-    assert "python -m agents.project" in workflow
-    assert "read/write access to the selected GitHub Project" in docs
+    assert "python -m agents.elixpoo_v1 triage" in workflow
+    assert "one Project item" in docs

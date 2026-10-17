@@ -172,26 +172,22 @@ def test_mentions_and_notification_urls_are_exact():
     assert _subject_identity("https://api.github.com/repos/o/r/issues/8") == ("o", "r", "issue", 8)
 
 
-def test_workflows_wire_turn_headroom_and_discussion_mentions():
-    agent_workflow = Path(".github/workflows/elixpo-agent.yml").read_text(encoding="utf-8")
+def test_v1_workflows_wire_exact_mentions_and_disconnect_steward_coding():
+    agent_workflow = Path(".github/workflows/elixpoo-mentions.yml").read_text(encoding="utf-8")
     discussion_workflow = Path(".github/workflows/discussions.yml").read_text(encoding="utf-8")
     steward_workflow = Path(".github/workflows/steward.yml").read_text(encoding="utf-8")
     intake_workflow = Path(".github/workflows/steward-intake.yml").read_text(encoding="utf-8")
 
-    assert "python -m agents.repository_agent" in agent_workflow
-    assert "claude-code-action" not in agent_workflow
-    assert "claude-code-router" not in agent_workflow
+    assert "elixpoo-mention-reusable.yml@v1" in agent_workflow
     assert "discussion_comment:" in discussion_workflow
     assert "python -m agents.discussions respond" in discussion_workflow
-    assert 'cron: "*/10 * * * *"' in steward_workflow
-    assert "types: [steward_issue_intake]" in intake_workflow
-    assert "python -m agents.steward.intake" in intake_workflow
+    assert "repository_dispatch" not in steward_workflow
+    assert "python -m agents.steward" not in steward_workflow
+    assert "repository_dispatch" not in intake_workflow
     fix_workflow = Path(".github/workflows/steward-fix.yml").read_text(encoding="utf-8")
     terminal_workflow = Path(".github/workflows/steward-terminal.yml").read_text(encoding="utf-8")
-    assert "types: [steward_fix]" in fix_workflow
-    assert "python -m agents.steward.fix" in fix_workflow
-    assert "types: [steward_terminal]" in terminal_workflow
-    assert "python -m agents.steward.celebrate" in terminal_workflow
+    assert "python -m agents.steward.fix" not in fix_workflow
+    assert "python -m agents.steward.celebrate" not in terminal_workflow
 
 
 def test_mention_intake_seeds_only_an_available_vet_slot(tmp_path):

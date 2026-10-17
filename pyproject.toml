@@ -5,14 +5,14 @@ build-backend = "hatchling.build"
 [project]
 name = "elixpoo"
 version = "1.3.0"
-description = "OreoFlow — policy-bound multi-agent control plane and model runtime"
+description = "Elixpoo — Elixpo's policy-bound GitHub project-management agent"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
 authors = [
     { name = "Ayushman Bhattacharya", email = "ayushman@pollinations.ai" },
 ]
-keywords = ["agents", "llm", "pollinations", "oreoflow"]
+keywords = ["github", "project-management", "pollinations", "automation"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: MIT License",

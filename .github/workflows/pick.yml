@@ -1,42 +1,16 @@
-name: pick
+name: Legacy autonomous contributor (inactive)
 
-# Chooses ONE provisional target from the triaged queue. Vet records the ledger
-# claim only after final suitability approval.
+# Elixpoo v1 is a project-management agent and never enters the historical
+# autonomous coding path. This inert manual workflow preserves the filename for
+# rollout compatibility while the implementation history is audited.
 
 on:
-  workflow_run:
-    workflows: [triage]
-    types: [completed]
-  schedule:
-    - cron: "0 9 * * *" # daily, 09:00 UTC (after scout+triage at 06:00)
   workflow_dispatch: {}
 
-permissions:
-  contents: write
-
-concurrency:
-  group: state-write
-  cancel-in-progress: false
+permissions: {}
 
 jobs:
-  pick:
+  inactive:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.ELIXPOO_GITHUB_AGENTIC_TOKEN }}
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Install
-        run: pip install -e .
-      - name: Run Pick
-        run: python -m agents.pick
-      - name: Commit choice
-        run: |
-          git config user.name "elixpoo"
-          git config user.email "elixpoo@gmail.com"
-          git add state/pick.json state/contracts.json
-          git diff --cached --quiet || git commit -m "chore(pick): propose next target"
-          git push
+      - run: echo 'Inactive in Elixpoo v1; see docs/archive/autonomous-contributor/README.md'

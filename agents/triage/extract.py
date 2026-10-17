@@ -15,7 +15,10 @@ from pathlib import Path
 from rtk.models import FunctionDef, Message, ToolDef
 from rtk.truncate import truncate_text
 
-_SKILL_PATH = Path(__file__).resolve().parents[2] / "skills" / "triage-solvable-issues" / "SKILL.md"
+_SKILL_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "docs/archive/autonomous-contributor/skills/triage-solvable-issues/SKILL.md"
+)
 
 
 def _skill_body() -> str:

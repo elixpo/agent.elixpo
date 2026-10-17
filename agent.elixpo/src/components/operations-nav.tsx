@@ -28,7 +28,7 @@ export function OperationsNav({ repositoryUrl }: { repositoryUrl: string }) {
     <header className="real-topbar">
       <Link className="real-brand" href="/">
         <Image src="/logo.png" alt="elixpoo" width={38} height={38} priority />
-        <span><strong>OreoFlow</strong><small>GitHub operations building</small></span>
+        <span><strong>Elixpoo</strong><small>GitHub project operations</small></span>
       </Link>
       <nav className="real-nav" aria-label="Operations">
         {links.map(({ href, label, icon: Icon }) => (

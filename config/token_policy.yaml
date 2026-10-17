@@ -1,6 +1,10 @@
 schema_version: 1
 restricted_secrets:
   ELIXPOO_GITHUB_AGENTIC_TOKEN:
+    - elixpoo-mentions.yml
+    - elixpoo-review.yml
+    - elixpoo-triage.yml
+    - elixpoo-merge-memory.yml
     - artifact-update.yml
     - admission.yml
     - daily-summary.yml
@@ -26,6 +30,10 @@ restricted_secrets:
     - triage.yml
     - vet.yml
   ELIXPO_POLLINATIONS_API_KEY:
+    - elixpoo-mentions.yml
+    - elixpoo-review.yml
+    - elixpoo-triage.yml
+    - elixpoo-merge-memory.yml
     - admission.yml
     - discussions.yml
     - elixpo-agent.yml
@@ -50,8 +58,11 @@ restricted_secrets:
   ELIXPOO_GITHUB_NOTIFICATIONS_TOKEN:
     - steward.yml
   ELIXPOO_GITHUB_PROJECT_TOKEN:
+    - elixpoo-mentions.yml
+    - elixpoo-triage.yml
     - project.yml
   ELIXPOO_GIST_AGENTIC_TOKEN:
+    - elixpoo-merge-memory.yml
     - discussions.yml
     - elixpo-ci.yml
     - gist-custodian.yml

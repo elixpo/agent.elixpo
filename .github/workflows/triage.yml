@@ -1,43 +1,16 @@
-name: triage
+name: Legacy autonomous contributor (inactive)
 
-# Scores candidate repos' open issues into a ranked queue (state/triaged.json).
-# Chains off Scout.
+# Elixpoo v1 is a project-management agent and never enters the historical
+# autonomous coding path. This inert manual workflow preserves the filename for
+# rollout compatibility while the implementation history is audited.
 
 on:
-  workflow_run:
-    workflows: [scout]
-    types: [completed]
   workflow_dispatch: {}
 
-permissions:
-  contents: write
-
-concurrency:
-  group: state-write
-  cancel-in-progress: false
+permissions: {}
 
 jobs:
-  triage:
+  inactive:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.ELIXPOO_GITHUB_AGENTIC_TOKEN }}
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Install
-        run: pip install -e .
-      - name: Run Triage
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ELIXPO_POLLINATIONS_API_KEY: ${{ secrets.ELIXPO_POLLINATIONS_API_KEY }}
-        run: python -m agents.triage
-      - name: Commit triaged queue
-        run: |
-          git config user.name "elixpoo"
-          git config user.email "elixpoo@gmail.com"
-          git add state/triaged.json state/triage_cache.json state/rejected_issues.json state/contracts.json
-          git diff --cached --quiet || git commit -m "chore(triage): refresh issue queue"
-          git push
+      - run: echo 'Inactive in Elixpoo v1; see docs/archive/autonomous-contributor/README.md'

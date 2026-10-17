@@ -4,7 +4,7 @@ import { ArrowLeft, BookOpen, Building2, ExternalLink, GitBranch, Layers3, Searc
 const destinations = [
   { href: "/", label: "Building", description: "Return to live agent operations", icon: Building2 },
   { href: "/floors", label: "Floors", description: "Browse operational domains", icon: Layers3 },
-  { href: "/docs", label: "Framework docs", description: "Build on the OreoFlow runtime", icon: BookOpen },
+  { href: "/docs", label: "Elixpoo docs", description: "Read the v1 project-management contract", icon: BookOpen },
 ];
 
 export default function NotFound() {

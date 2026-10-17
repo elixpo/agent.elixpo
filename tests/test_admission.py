@@ -18,6 +18,8 @@ from agents.admission.core import (
 from agents.solve.core import SolveRejected, resolve_target
 from lib.state.store import StateStore
 
+pytestmark = pytest.mark.skip(reason="legacy autonomous admission is inactive in Elixpoo v1")
+
 NOW = datetime(2026, 8, 12, 12, 0, tzinfo=timezone.utc)
 URL = "https://github.com/example/project/issues/7"
 KEY = "example/project#7"

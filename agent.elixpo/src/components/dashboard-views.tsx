@@ -145,14 +145,12 @@ function RuntimeRail({ runs, title = "Current runtime flow", caption = "Active f
 }
 
 const oreoFlowStages = [
-  { id: "scout", name: "Scout", role: "discover" },
   { id: "triage", name: "Triage", role: "classify" },
-  { id: "pick", name: "Pick", role: "select" },
-  { id: "vet", name: "Vet", role: "verify" },
-  { id: "solve", name: "Solve", role: "implement" },
-  { id: "submit", name: "Submit", role: "publish" },
-  { id: "steward", name: "Steward", role: "shepherd" },
-  { id: "project", name: "Project", role: "synchronize" },
+  { id: "project", name: "Project V2", role: "synchronize" },
+  { id: "mention", name: "Mentions", role: "respond" },
+  { id: "review", name: "PR Review", role: "inspect" },
+  { id: "safety", name: "Safety", role: "guard" },
+  { id: "merge", name: "Merge memory", role: "remember" },
 ] as const;
 
 function A2ANode({ name, role, run, step }: { name: string; role: string; run?: DashboardRun; step: number }) {
@@ -246,7 +244,7 @@ export function BuildingDashboard({ snapshot }: { snapshot: DashboardSnapshot })
 
       <div className="real-building-grid">
         <section className="real-panel building-visual-card">
-          <div className="real-panel-head"><div><small>Live A2A route</small><h2>OreoFlow agent dataflow</h2></div><span className="source-pill"><Radio size={13} /> refreshed {time(snapshot.generatedAt)}</span></div>
+          <div className="real-panel-head"><div><small>Live v1 route</small><h2>Elixpoo project-management flow</h2></div><span className="source-pill"><Radio size={13} /> refreshed {time(snapshot.generatedAt)}</span></div>
           <div className="a2a-building-zone">
             <div className="a2a-flow-map" aria-label="OreoFlow agent-to-agent route">
               <div className="a2a-route-label"><span><Workflow size={17} /> Primary route</span><small className={activeStageCount ? "a2a-live-summary is-live" : "a2a-live-summary"}><i />{activeStageCount ? `${activeStageCount} ${activeStageCount === 1 ? "stage" : "stages"} live now` : "No stages running now"}</small></div>
@@ -265,7 +263,7 @@ export function BuildingDashboard({ snapshot }: { snapshot: DashboardSnapshot })
               </div>
             </div>
           </div>
-          <div className="building-source-note"><Workflow size={17} /><span>A2A connections show the configured OreoFlow route; node state comes from GitHub Actions and committed receipts. Room memory is not estimated.</span></div>
+          <div className="building-source-note"><Workflow size={17} /><span>The route shows configured v1 capabilities; node state comes from GitHub Actions and committed receipts. Elixpoo does not implement repository code.</span></div>
           <RuntimeRail runs={runtimeRoute} />
         </section>
 

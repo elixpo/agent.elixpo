@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 
 export const SITE_URL = "https://agent.elixpo.com";
-export const SITE_NAME = "OreoFlow";
-export const SITE_TITLE = "OreoFlow · Live Agent Operations";
+export const SITE_NAME = "Elixpoo";
+export const SITE_TITLE = "Elixpoo · Live Project Operations";
 export const SITE_DESCRIPTION =
-  "Follow OreoFlow, Elixpo's public autonomous GitHub operations system: live workflow runs, repository work, discussions, security events, and agent activity.";
+  "Follow Elixpo's public GitHub project-management agent: live triage, mentions, reviews, Project records, discussions, merge history, and safety activity.";
 
 export const SOCIAL_IMAGE = {
   url: "/default.png",
   width: 1280,
   height: 720,
   type: "image/png",
-  alt: "OreoFlow live agent operations dashboard",
+  alt: "Elixpoo live project operations dashboard",
 };
 
 export function absoluteUrl(path = "/") {

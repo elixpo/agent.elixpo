@@ -1,4 +1,4 @@
-"""Scout's pure filter + health-scoring logic (docs/refactor_plan.md section 3).
+"""Legacy Scout filter and health-scoring logic (inactive in Elixpoo v1).
 
 No I/O — operates on plain repo dicts (GitHub search API shape), so it's fully
 unit-testable. The fetching lives in agents.scout.discover.

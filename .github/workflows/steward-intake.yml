@@ -1,41 +1,16 @@
-name: steward issue intake
+name: Legacy autonomous contributor (inactive)
+
+# Elixpoo v1 is a project-management agent and never enters the historical
+# autonomous coding path. This inert manual workflow preserves the filename for
+# rollout compatibility while the implementation history is audited.
 
 on:
-  repository_dispatch:
-    types: [steward_issue_intake]
+  workflow_dispatch: {}
 
-permissions:
-  contents: write
-
-concurrency:
-  group: state-write
-  cancel-in-progress: false
+permissions: {}
 
 jobs:
-  queue:
+  inactive:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.ELIXPOO_GITHUB_AGENTIC_TOKEN }}
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install -e .
-      - name: Validate and queue issue
-        env:
-          ISSUE_URL: ${{ github.event.client_payload.issue_url }}
-          SOURCE_COMMENT_ID: ${{ github.event.client_payload.source_comment_id }}
-        run: python -m agents.steward.intake --issue-url "$ISSUE_URL" --source-comment-id "$SOURCE_COMMENT_ID"
-      - name: Commit intake receipt
-        run: |
-          git config user.name "elixpoo"
-          git config user.email "elixpoo@gmail.com"
-          git add state/pick.json state/contracts.json
-          git diff --cached --quiet || git commit -m "chore(steward): queue mentioned issue"
-          git push
-      - name: Start Vet
-        env:
-          GH_TOKEN: ${{ secrets.ELIXPOO_GITHUB_AGENTIC_TOKEN }}
-        run: gh api --method POST "repos/${{ github.repository }}/dispatches" -f event_type=steward_vet
+      - run: echo 'Inactive in Elixpoo v1; see docs/archive/autonomous-contributor/README.md'
