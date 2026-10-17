@@ -3,7 +3,7 @@ import { pageMetadata } from "@/lib/site-metadata";
 
 export const metadata = pageMetadata(
   "Security Watch",
-  "Review public safety signals, workflow failures, policy gates, and security events from OreoFlow operations.",
+  "Review public safety signals, workflow failures, authorization gates, and security events from Elixpoo operations.",
   "/security",
 );
 

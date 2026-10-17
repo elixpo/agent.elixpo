@@ -15,6 +15,7 @@ import secrets
 from datetime import datetime, timedelta, timezone
 
 import structlog
+from lib.state.contracts import StateBoundaryError
 from lib.state.ledger import Ledger
 from lib.state.rejections import RejectionLedger
 from lib.state.store import StateStore
@@ -41,13 +42,18 @@ def run(store: StateStore, now: datetime | None = None) -> dict | None:
         log.info("pick.awaiting_vet", key=f"{pending.get('repo')}#{pending.get('number')}")
         return pending
 
-    triaged = store.read_state(
-        "triaged.json",
-        [],
-        expected_producer="triage",
-        max_age=timedelta(hours=24),
-        now=now,
-    )
+    try:
+        triaged = store.read_state(
+            "triaged.json",
+            [],
+            expected_producer="triage",
+            max_age=timedelta(hours=24),
+            now=now,
+        )
+    except StateBoundaryError as exc:
+        if "older than" not in str(exc) and "contract expired at" not in str(exc):
+            raise
+        triaged = []
     if not triaged:
         log.warning("pick.no_triaged", hint="run agents.triage first")
         store.write_state(
@@ -100,6 +106,7 @@ def run(store: StateStore, now: datetime | None = None) -> dict | None:
         "number": pick["number"],
         "title": pick.get("title", ""),
         "url": pick.get("url", ""),
+        "source": "autonomous_scout",
         "issue_age_days": pick.get("issue_age_days"),
         "activity_age_days": pick.get("activity_age_days"),
         "issue_updated_at": pick.get("issue_updated_at", ""),

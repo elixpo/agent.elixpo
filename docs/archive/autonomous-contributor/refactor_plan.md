@@ -82,7 +82,9 @@ activity permits one fresh evaluation.
 - **Skill:** included in `skills/solve-bounded-issue/SKILL.md`
 
 ### Solve — Coding
-- **Trigger:** successful Vet workflow with an approved Pick, or explicit allowlisted owned-test mode.
+- **Trigger:** a revision-bound `oreoflow/approved` admission from the control
+  repository, one Doctor-authorized retry of that same admission, or explicit
+  allowlisted owned-test mode. A successful Vet never starts Solve directly.
 - **Budget:** 15 minutes and 24k tokens; no whole-pipeline retry.
 - **Agents:** Python workspace supervisor, CCR-routed Node coding harness, deterministic verifier.
 - **Model:** `qwen-coder` runs through the CCR Node coding harness. Python supervises the same bounded session locally and in Actions, then owns verification and commit gates.

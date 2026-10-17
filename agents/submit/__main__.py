@@ -17,7 +17,10 @@ from lib.workspace import git_auth_env
 from rtk.models import Message
 
 log = structlog.get_logger()
-SKILL_PATH = Path(__file__).resolve().parents[2] / "skills" / "submit-autonomous-pr" / "SKILL.md"
+SKILL_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "docs/archive/autonomous-contributor/skills/submit-autonomous-pr/SKILL.md"
+)
 PERSONA_PATH = Path(__file__).resolve().parents[2] / "skills" / "living-repo-persona" / "SKILL.md"
 
 

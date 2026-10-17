@@ -277,8 +277,10 @@ async def _run() -> int:
         log.error("triage.no_token", hint="set GITHUB_TOKEN in .env.local")
         return 1
     store = StateStore(settings.state_dir)
-    cache_payload = store.read_state(
-        "triage_cache.json", {}, expected_producer="triage-cache"
+    cache_payload = (
+        store.read_state("triage_cache.json", {}, expected_producer="triage-cache")
+        if store.read_json("triage_cache.json", None) is not None
+        else {}
     ) or {}
     model_cache = dict(cache_payload.get("entries") or {})
     candidates = store.read_state(

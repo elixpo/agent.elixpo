@@ -322,6 +322,7 @@ def test_snapshot_prefers_live_solve_and_doctor_evidence():
         doctor={"key": "elixpo/project#9", "current": {"reason": "provider unavailable"}},
         janitor={},
         steward_fix={},
+        admission={},
     )
 
     assert snapshot.status == "cleanup pending"
@@ -340,6 +341,22 @@ def test_project_reads_only_contracted_operational_state(tmp_path):
     solve = {"status": "running", "run_id": "run-1", "key": "elixpo/project#9"}
     store.write_state("solve.json", solve, producer="solve")
     assert current_states(store)["solve"] == solve
+
+
+def test_project_treats_expired_operational_receipt_as_not_live(tmp_path):
+    from datetime import datetime, timedelta, timezone
+
+    store = StateStore(tmp_path)
+    now = datetime(2026, 8, 12, tzinfo=timezone.utc)
+    store.write_state(
+        "pick.json",
+        {"status": "no_pick"},
+        producer="pick",
+        ttl=timedelta(hours=1),
+        now=now - timedelta(hours=2),
+    )
+
+    assert current_states(store)["pick"] == {}
 
 
 @pytest.mark.asyncio
@@ -401,12 +418,11 @@ async def test_reconcile_isolates_one_project_item_failure(tmp_path, monkeypatch
     assert result["failures"] == [{"key": "elixpo/project#10", "error": "field unavailable"}]
 
 
-def test_project_workflow_and_docs_define_recovery_and_dedicated_token():
-    workflow = Path(".github/workflows/project.yml").read_text(encoding="utf-8")
-    docs = Path("docs/project-operations.md").read_text(encoding="utf-8")
+def test_v1_triage_uses_dedicated_project_token():
+    workflow = Path(".github/workflows/elixpoo-triage-reusable.yml").read_text(encoding="utf-8")
+    docs = Path("docs/elixpoo-v1.md").read_text(encoding="utf-8")
 
-    assert 'cron: "*/15 * * * *"' in workflow
+    assert "workflow_call:" in workflow
     assert "ELIXPOO_GITHUB_PROJECT_TOKEN" in workflow
-    assert "group: state-write" in workflow
-    assert "python -m agents.project" in workflow
-    assert "read/write access to the selected GitHub Project" in docs
+    assert "python -m agents.elixpoo_v1 triage" in workflow
+    assert "one Project item" in docs

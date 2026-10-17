@@ -74,9 +74,9 @@ export type FloorDefinition = {
 };
 
 export const floors: FloorDefinition[] = [
-  { slug: "operations", level: "G", name: "Operations lobby", shortName: "Mentions", description: "Repository mentions, approvals, acknowledgements, issue intake, and PR operations.", accent: "#3975d5" },
-  { slug: "oreoflow", level: "1", name: "OreoFlow", shortName: "Autonomous work", description: "Scout, triage, vet, solve, submit, steward, project, doctor, and janitor runs.", accent: "#e53935" },
-  { slug: "discussions", level: "2", name: "Discussions", shortName: "Community desk", description: "Announcements, Q&A, polls, mention replies, and discussion safety checks.", accent: "#7856c8" },
+  { slug: "operations", level: "01", name: "Repository signals", shortName: "Public activity", description: "Issues, pull requests, workflow runs, and operational records from the control repository.", accent: "#3975d5" },
+  { slug: "oreoflow", level: "02", name: "Elixpoo v1", shortName: "Project management", description: "Triage, Project V2, exact mentions, COMMENT reviews, safety, and merge memory.", accent: "#e53935" },
+  { slug: "discussions", level: "03", name: "Community protocol", shortName: "Discussions", description: "Canonical announcements, Q&A, polls, exact mention replies, and safety checks.", accent: "#7856c8" },
 ];
 
 export type DashboardSnapshot = {

@@ -145,14 +145,12 @@ function RuntimeRail({ runs, title = "Current runtime flow", caption = "Active f
 }
 
 const oreoFlowStages = [
-  { id: "scout", name: "Scout", role: "discover" },
   { id: "triage", name: "Triage", role: "classify" },
-  { id: "pick", name: "Pick", role: "select" },
-  { id: "vet", name: "Vet", role: "verify" },
-  { id: "solve", name: "Solve", role: "implement" },
-  { id: "submit", name: "Submit", role: "publish" },
-  { id: "steward", name: "Steward", role: "shepherd" },
-  { id: "project", name: "Project", role: "synchronize" },
+  { id: "project", name: "Project V2", role: "synchronize" },
+  { id: "mention", name: "Mentions", role: "respond" },
+  { id: "review", name: "PR Review", role: "inspect" },
+  { id: "safety", name: "Safety", role: "guard" },
+  { id: "merge", name: "Merge memory", role: "remember" },
 ] as const;
 
 function A2ANode({ name, role, run, step }: { name: string; role: string; run?: DashboardRun; step: number }) {
@@ -165,18 +163,6 @@ function A2ANode({ name, role, run, step }: { name: string; role: string; run?: 
   return run?.url
     ? <a className="a2a-agent" href={run.url} target="_blank" rel="noreferrer">{content}</a>
     : <div className="a2a-agent">{content}</div>;
-}
-
-function A2AReceiptNode({ receipt, name, role, icon }: { receipt?: StateReceipt; name: string; role: string; icon: React.ReactNode }) {
-  const tone = receipt ? receiptTone(receipt) : "neutral";
-  const content = <>
-    <span className="a2a-agent-head"><span className={`a2a-agent-icon tone-${tone}`}>{icon}</span><small>{role}</small></span>
-    <span className="a2a-agent-copy"><strong>{name}</strong><small>Continuous supervision</small></span>
-    <span className="a2a-agent-foot"><span className={`a2a-agent-state tone-${tone}`}>{receipt?.status || "no receipt"}</span><span className="a2a-agent-meta">{receipt ? `${receipt.stage} · ${receipt.updatedAt ? time(receipt.updatedAt) : "time not reported"}` : "No committed state receipt returned"}</span></span>
-  </>;
-  return receipt?.issueUrl
-    ? <a className="a2a-agent a2a-support-agent" href={receipt.issueUrl} target="_blank" rel="noreferrer">{content}</a>
-    : <div className="a2a-agent a2a-support-agent">{content}</div>;
 }
 
 function RunRow({ run }: { run: DashboardRun }) {
@@ -229,27 +215,37 @@ export function BuildingDashboard({ snapshot }: { snapshot: DashboardSnapshot })
   const oreoRuns = snapshot.runs.filter((run) => run.floor === "oreoflow");
   const stageRuns = new Map(oreoFlowStages.map((stage) => [stage.id, oreoRuns.find((run) => run.name.toLowerCase().includes(stage.id))]));
   const activeStageCount = [...stageRuns.values()].filter((run) => run?.status === "in_progress" || run?.status === "queued").length;
-  const doctorReceipt = snapshot.receipts.find((receipt) => receipt.name === "doctor");
-  const janitorReceipt = snapshot.receipts.find((receipt) => receipt.name === "janitor");
-
   return (
-    <main className="real-page">
-      <PageHeading eyebrow="Live control plane" title="Agent operations building" copy="Rooms and activity are reconstructed from GitHub Actions and committed state receipts." />
+    <main className="real-page geo-page">
+      <section className="geo-hero">
+        <div className="geo-hero-copy">
+          <span className="geo-version"><i /> ELIXPOO / V1 DIRECTIVE</span>
+          <h1>Project operations,<br /><em>within a hard boundary.</em></h1>
+          <p>Elixpoo coordinates GitHub project work. It triages, synchronizes Project V2, responds to exact mentions, reviews pull requests, moderates Discussions, and records merge memory. It does not write product code.</p>
+          <div className="geo-hero-actions"><Link href="/docs">Read the directive <ArrowRight size={15} /></Link><a href={snapshot.repository.url} target="_blank" rel="noreferrer">Inspect source <ExternalLink size={14} /></a></div>
+        </div>
+        <div className="geo-mark" aria-hidden="true">
+          <span className="geo-mark-ring ring-one" /><span className="geo-mark-ring ring-two" />
+          <span className="geo-mark-axis axis-x" /><span className="geo-mark-axis axis-y" />
+          <span className="geo-mark-core"><Bot size={30} /></span>
+          <i className="geo-point point-a" /><i className="geo-point point-b" /><i className="geo-point point-c" /><i className="geo-point point-d" />
+        </div>
+      </section>
       <WarningStrip snapshot={snapshot} />
       <AgentPulse snapshot={snapshot} />
-      <section className="real-metrics">
+      <section className="real-metrics geo-metrics">
         <div><Play /><span><small>Active runs</small><strong>{active.length}</strong></span></div>
-        <div><Layers3 /><span><small>Operational floors</small><strong>{floors.length}</strong></span></div>
+        <div><Layers3 /><span><small>Capability domains</small><strong>{floors.length}</strong></span></div>
         <div><GitPullRequest /><span><small>Open work</small><strong>{openWork.length}</strong></span></div>
         <div><AlertTriangle /><span><small>Failed runs in feed</small><strong>{failed.length}</strong></span></div>
       </section>
 
-      <div className="real-building-grid">
-        <section className="real-panel building-visual-card">
-          <div className="real-panel-head"><div><small>Live A2A route</small><h2>OreoFlow agent dataflow</h2></div><span className="source-pill"><Radio size={13} /> refreshed {time(snapshot.generatedAt)}</span></div>
-          <div className="a2a-building-zone">
-            <div className="a2a-flow-map" aria-label="OreoFlow agent-to-agent route">
-              <div className="a2a-route-label"><span><Workflow size={17} /> Primary route</span><small className={activeStageCount ? "a2a-live-summary is-live" : "a2a-live-summary"}><i />{activeStageCount ? `${activeStageCount} ${activeStageCount === 1 ? "stage" : "stages"} live now` : "No stages running now"}</small></div>
+      <div className="real-building-grid geo-dashboard-grid">
+        <section className="real-panel building-visual-card geo-route-panel">
+          <div className="real-panel-head"><div><small>Bounded protocol</small><h2>Live project-management route</h2></div><span className="source-pill"><Radio size={13} /> {time(snapshot.generatedAt)}</span></div>
+          <div className="a2a-building-zone geo-protocol-zone">
+            <div className="a2a-flow-map geo-protocol-map" aria-label="Elixpoo v1 capability route">
+              <div className="a2a-route-label"><span><Workflow size={17} /> Deterministic boundary</span><small className={activeStageCount ? "a2a-live-summary is-live" : "a2a-live-summary"}><i />{activeStageCount ? `${activeStageCount} live` : "idle"}</small></div>
               <div className="a2a-primary-route">
                 {oreoFlowStages.map((stage, index) => (
                   <div className="a2a-hop" key={stage.id}>
@@ -258,29 +254,25 @@ export function BuildingDashboard({ snapshot }: { snapshot: DashboardSnapshot })
                   </div>
                 ))}
               </div>
-              <div className="a2a-support-lane">
-                <div className="a2a-support-title"><ShieldCheck size={15} /><span>Supervision lane</span><i /></div>
-                <A2AReceiptNode receipt={doctorReceipt} name="Doctor" role="runtime guard" icon={<Activity size={17} />} />
-                <A2AReceiptNode receipt={janitorReceipt} name="Janitor" role="cleanup" icon={<Box size={17} />} />
-              </div>
+              <div className="geo-boundary-note"><ShieldCheck size={17} /><span>Models propose typed actions. Deterministic policy owns authorization, allowlists, idempotency, and public-post safety.</span></div>
             </div>
           </div>
-          <div className="building-source-note"><Workflow size={17} /><span>A2A connections show the configured OreoFlow route; node state comes from GitHub Actions and committed receipts. Room memory is not estimated.</span></div>
+          <div className="building-source-note"><Workflow size={17} /><span>Capability state is reconstructed from GitHub Actions and committed receipts. No simulated runtime data is shown.</span></div>
           <RuntimeRail runs={runtimeRoute} />
         </section>
 
-        <section className="real-panel floor-summary-card">
-          <div className="real-panel-head"><div><small>Floor directory</small><h2>Operational domains</h2></div><Link href="/floors">Open directory <ArrowRight size={15} /></Link></div>
+        <section className="real-panel floor-summary-card geo-domains-panel">
+          <div className="real-panel-head"><div><small>System map</small><h2>Capability domains</h2></div><Link href="/floors">Open map <ArrowRight size={15} /></Link></div>
           <div className="real-floor-list">
             {floors.map((floor) => {
               const floorRuns = snapshot.runs.filter((run) => run.floor === floor.slug);
-              return <Link href={`/${floor.slug}`} key={floor.slug}><span style={{ color: floor.accent }}><FloorIcon slug={floor.slug} /></span><span><strong>{floor.name}</strong><small>{floor.description}</small></span><b>{floorRuns.length}</b></Link>;
+              return <Link href={`/${floor.slug}`} key={floor.slug} style={{ "--domain-accent": floor.accent } as React.CSSProperties}><span style={{ color: floor.accent }}><FloorIcon slug={floor.slug} /></span><span><strong>{floor.name}</strong><small>{floor.description}</small></span><b>{floorRuns.length}</b></Link>;
             })}
           </div>
         </section>
 
         <section className="real-panel security-card">
-          <div className="real-panel-head"><div><small>Building security</small><h2>Latest activity</h2></div><Link href="/security">Open security <ArrowRight size={15} /></Link></div>
+          <div className="real-panel-head"><div><small>Policy evidence</small><h2>Security signals</h2></div><Link href="/security">Open feed <ArrowRight size={15} /></Link></div>
           {snapshot.security.length ? <div className="security-feed">{snapshot.security.slice(0, 5).map((event) => <div key={event.id}><span className={`security-dot tone-${event.level === "critical" ? "danger" : event.level}`} /><span><strong>{event.title}</strong><small>{event.detail}</small><em>{event.source} · {time(event.occurredAt)}</em></span></div>)}</div> : <Empty>No security workflow activity was returned by GitHub.</Empty>}
         </section>
 
@@ -297,8 +289,8 @@ export function BuildingDashboard({ snapshot }: { snapshot: DashboardSnapshot })
 
 export function FloorDirectoryView({ snapshot }: { snapshot: DashboardSnapshot }) {
   return (
-    <main className="real-page">
-      <PageHeading eyebrow="Building directory" title="Floor directory" copy="Each floor is a real operational slice of the control repository's workflow history." />
+    <main className="real-page geo-page">
+      <PageHeading eyebrow="System topology" title="Capability map" copy="Three bounded domains, each grounded in the control repository's public GitHub record." />
       <WarningStrip snapshot={snapshot} />
       <AgentPulse snapshot={snapshot} />
       <div className="directory-grid">
@@ -307,7 +299,7 @@ export function FloorDirectoryView({ snapshot }: { snapshot: DashboardSnapshot }
           const active = runs.filter((run) => run.status !== "completed").length;
           const lastRun = runs[0];
           return (
-            <Link className="directory-card" href={`/${floor.slug}`} key={floor.slug} style={{ "--floor-accent": floor.accent } as React.CSSProperties}>
+            <Link className="directory-card geo-directory-card" href={`/${floor.slug}`} key={floor.slug} style={{ "--floor-accent": floor.accent } as React.CSSProperties}>
               <div className="directory-number">{floor.level}</div>
               <span className="directory-icon"><FloorIcon slug={floor.slug} /></span>
               <h2>{floor.name}</h2><p>{floor.description}</p>
@@ -323,17 +315,17 @@ export function FloorDirectoryView({ snapshot }: { snapshot: DashboardSnapshot }
 
 export function FloorView({ snapshot, floor }: { snapshot: DashboardSnapshot; floor: FloorDefinition }) {
   const classifiedRuns = snapshot.runs.filter((run) => run.floor === floor.slug);
-  const usingBuildingHistory = floor.slug === "operations" && classifiedRuns.length === 0;
-  const runs = usingBuildingHistory ? snapshot.runs.slice(0, 20) : classifiedRuns;
+  const usingRepositoryHistory = floor.slug === "operations" && classifiedRuns.length === 0;
+  const runs = usingRepositoryHistory ? snapshot.runs.slice(0, 20) : classifiedRuns;
   const receipts = floor.slug === "oreoflow" ? snapshot.receipts : [];
   const active = classifiedRuns.filter((run) => run.status !== "completed");
   const runtimeRoute = uniqueRuntimeRoute([...active, ...runs]);
   return (
     <main className="real-page">
       <div className="floor-route-heading" style={{ "--floor-accent": floor.accent } as React.CSSProperties}>
-        <Link href="/floors">Floor directory</Link>
+        <Link href="/floors">Capability map</Link>
         <span className="floor-route-level">{floor.level}</span>
-        <div><span className="real-eyebrow">Operational floor</span><h1>{floor.name}</h1><p>{floor.description}</p></div>
+        <div><span className="real-eyebrow">Capability domain</span><h1>{floor.name}</h1><p>{floor.description}</p></div>
       </div>
       <WarningStrip snapshot={snapshot} />
       <AgentPulse snapshot={snapshot} />
@@ -344,16 +336,16 @@ export function FloorView({ snapshot, floor }: { snapshot: DashboardSnapshot; fl
         <div><MemoryStick /><span><small>Runtime memory</small><strong className="metric-date">Not reported</strong></span></div>
       </section>
       <section className="real-panel floor-runtime-flow">
-        <RuntimeRail runs={runtimeRoute} title={`${floor.name} agent data flow`} caption={usingBuildingHistory ? "No lobby-specific room returned · showing recent building history" : "Distinct workflow rooms, ordered from active to latest"} />
+        <RuntimeRail runs={runtimeRoute} title={`${floor.name} data flow`} caption={usingRepositoryHistory ? "No domain-specific run returned · showing recent repository history" : "Distinct workflows, ordered from active to latest"} />
       </section>
       <div className="floor-route-grid">
         <section className="real-panel floor-runs-panel">
-          <div className="real-panel-head"><div><small>{usingBuildingHistory ? "Past activity" : "Rooms"}</small><h2>{usingBuildingHistory ? "Recent workflow run times" : "Workflow runs on this floor"}</h2></div><span>{usingBuildingHistory ? `${runs.length} historical` : `${active.length} active`}</span></div>
-          <div className="real-table">{runs.length ? runs.map((run) => <RunRow run={run} key={run.id} />) : <Empty>No workflow runs are currently classified on this floor.</Empty>}</div>
+          <div className="real-panel-head"><div><small>{usingRepositoryHistory ? "Past activity" : "Signals"}</small><h2>{usingRepositoryHistory ? "Recent workflow run times" : "Workflow runs in this domain"}</h2></div><span>{usingRepositoryHistory ? `${runs.length} historical` : `${active.length} active`}</span></div>
+          <div className="real-table">{runs.length ? runs.map((run) => <RunRow run={run} key={run.id} />) : <Empty>No workflow runs are currently classified in this domain.</Empty>}</div>
         </section>
         <aside className="real-panel floor-inspector">
           <div className="real-panel-head"><div><small>Agent telemetry</small><h2>What GitHub reports</h2></div></div>
-          <dl><div><dt>Status</dt><dd>Actions run status</dd></div><div><dt>Logs</dt><dd>Available through each run link</dd></div><div><dt>Token use</dt><dd>{receipts.some((r) => r.tokenSpent !== null) ? "From state receipts" : "Not reported for this floor"}</dd></div><div><dt>Memory</dt><dd>Not reported by GitHub Actions</dd></div></dl>
+          <dl><div><dt>Status</dt><dd>Actions run status</dd></div><div><dt>Logs</dt><dd>Available through each run link</dd></div><div><dt>Token use</dt><dd>{receipts.some((r) => r.tokenSpent !== null) ? "From state receipts" : "Not reported for this domain"}</dd></div><div><dt>Memory</dt><dd>Not reported by GitHub Actions</dd></div></dl>
           {receipts.length > 0 && <div className="receipt-stack"><h3>Latest state receipts</h3>{receipts.map((receipt) => <div key={receipt.name}><span className={`real-badge tone-${receiptTone(receipt)}`}>{receipt.status}</span><strong>{receipt.name} · {receipt.stage}</strong><small>{receipt.tokenSpent !== null ? `${receipt.tokenSpent.toLocaleString()} tokens` : "Token use not reported"}</small></div>)}</div>}
         </aside>
       </div>
@@ -389,9 +381,9 @@ export function JournalView({ snapshot }: { snapshot: DashboardSnapshot }) {
 
 export function SecurityView({ snapshot }: { snapshot: DashboardSnapshot }) {
   return (
-    <main className="real-page"><PageHeading eyebrow="Guard desk" title="Building security" copy="Security workflow activity, failed Actions runs, and Doctor or Janitor decisions from committed receipts." /><WarningStrip snapshot={snapshot} /><AgentPulse snapshot={snapshot} />
+    <main className="real-page"><PageHeading eyebrow="Policy boundary" title="Security evidence" copy="Security workflow activity, failed Actions runs, and durable policy decisions from committed receipts." /><WarningStrip snapshot={snapshot} /><AgentPulse snapshot={snapshot} />
       <div className="alerts-grid"><section className="real-panel full-list-panel"><div className="real-panel-head"><div><small>Evidence feed</small><h2>Security and guard activity</h2></div><span>{snapshot.security.length} events</span></div>{snapshot.security.length ? <div className="alerts-feed">{snapshot.security.map((event) => <a href={event.url || undefined} target={event.url ? "_blank" : undefined} rel={event.url ? "noreferrer" : undefined} key={event.id}><span className={`alert-icon tone-${event.level === "critical" ? "danger" : event.level}`}>{event.level === "success" ? <ShieldCheck /> : <AlertTriangle />}</span><span><strong>{event.title}</strong><p>{event.detail}</p><small>{event.source} · {time(event.occurredAt)}</small></span>{event.url && <ExternalLink size={16} />}</a>)}</div> : <Empty>No security events were returned by GitHub or committed state receipts.</Empty>}</section>
-      <aside className="real-panel evidence-card"><ShieldCheck size={28} /><h2>Evidence policy</h2><p>This page does not infer vulnerabilities or runtime health. It reports failed runs, security workflow runs, and durable Doctor or Janitor decisions.</p><dl><div><dt>RAM</dt><dd>Not reported</dd></div><div><dt>Workflow logs</dt><dd>Linked from GitHub</dd></div><div><dt>Receipts</dt><dd>Committed state JSON</dd></div></dl></aside></div>
+      <aside className="real-panel evidence-card"><ShieldCheck size={28} /><h2>Evidence policy</h2><p>This page does not infer vulnerabilities or runtime health. It reports failed runs, security workflows, and durable policy receipts.</p><dl><div><dt>RAM</dt><dd>Not reported</dd></div><div><dt>Workflow logs</dt><dd>Linked from GitHub</dd></div><div><dt>Receipts</dt><dd>Committed state JSON</dd></div></dl></aside></div>
     </main>
   );
 }

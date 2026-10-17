@@ -132,14 +132,9 @@ def test_doctor_records_idempotent_state_and_authorizes_janitor(tmp_path):
     assert len(doctor["history"]) == 1
 
 
-def test_solve_workflow_runs_recovery_on_the_same_runner_and_bounds_retry():
+def test_solve_workflow_is_inactive_in_v1():
     workflow = Path(".github/workflows/solve.yml").read_text(encoding="utf-8")
 
-    assert "types: [doctor_retry]" in workflow
-    assert "python -m agents.doctor" in workflow
-    assert "python -m agents.janitor" in workflow
-    assert "steps.solve.outcome == 'failure'" in workflow
-    assert "steps.submit.outcome == 'success'" in workflow
-    assert "steps.doctor.outputs.action == 'retry'" in workflow
-    assert "state/doctor.json" in workflow
-    assert "state/janitor.json" in workflow
+    assert "workflow_dispatch" in workflow
+    assert "python -m agents.solve" not in workflow
+    assert "repository_dispatch" not in workflow

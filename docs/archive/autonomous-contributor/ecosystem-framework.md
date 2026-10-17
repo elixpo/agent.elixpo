@@ -1,5 +1,12 @@
 # Elixpo agent ecosystem framework roadmap
 
+> Released baseline: OreoFlow `v1.3.0` provides the public `oreoflow/`
+> contracts for agent cards, capabilities, rooms, tasks, integrity-checked
+> messages, artifacts, policy grants, deterministic routing, adapter protocols,
+> JSON Schemas, and the model Router. This document still tracks hosted
+> scheduling, durable room leases, carrier delivery, security residents, and
+> official external protocol conformance.
+
 This is the dependency-ordered plan for evolving `agent.elixpo` from a set of
 independent squads into a vertically scalable multi-agent ecosystem.
 

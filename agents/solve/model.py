@@ -12,7 +12,7 @@ from rtk.truncate import truncate_text
 
 from agents.solve.models import ReviewVerdict, SolvePlan, StepImplementation
 
-_SKILLS = Path(__file__).resolve().parents[2] / "skills"
+_SKILLS = Path(__file__).resolve().parents[2] / "docs/archive/autonomous-contributor/skills"
 T = TypeVar("T", bound=BaseModel)
 
 

@@ -7,6 +7,7 @@ from typing import Any
 
 from lib.github.issues import parse_issue_url
 from lib.state.board import ProjectSnapshot
+from lib.state.contracts import StateBoundaryError
 from lib.state.ledger import Ledger, PRRecord
 
 _LEDGER_STATUS = {
@@ -58,6 +59,7 @@ def snapshot_for_record(
     doctor: dict,
     janitor: dict,
     steward_fix: dict,
+    admission: dict,
 ) -> ProjectSnapshot:
     status, squad = _LEDGER_STATUS.get(record.status, ("rejected", "operator"))
     matching_solve = solve if _same_key(solve, key) else {}
@@ -65,9 +67,14 @@ def snapshot_for_record(
     matching_fix = steward_fix if _same_key(steward_fix, key) else {}
     matching_doctor = doctor if _same_key(doctor, key) else {}
     matching_janitor = janitor if _same_key(janitor, key) else {}
+    matching_admission = admission if _same_key(admission, key) else {}
 
     solve_status = str(matching_solve.get("status") or "")
     if record.status not in {"merged", "closed"}:
+        if matching_admission.get("status") == "approval_required":
+            status, squad = "claimed", "admission"
+        elif matching_admission.get("status") == "approved" and not solve_status:
+            status, squad = "claimed", "solve"
         if solve_status in {"running", "doctor_pending"}:
             status, squad = ("cleanup pending", "doctor") if solve_status == "doctor_pending" else ("solving", "solve")
         elif solve_status in {"solved", "ready"}:
@@ -92,6 +99,8 @@ def snapshot_for_record(
         matching_submit.get("submitted_at", ""),
         matching_fix.get("completed_at", ""),
         matching_janitor.get("cleaned_at", ""),
+        matching_admission.get("approved_at", ""),
+        matching_admission.get("proposed_at", ""),
     )
     return ProjectSnapshot(
         issue_key=key,
@@ -133,6 +142,7 @@ async def build_snapshots(api, ledger: Ledger, states: dict[str, dict]) -> tuple
                     doctor=states.get("doctor", {}),
                     janitor=states.get("janitor", {}),
                     steward_fix=states.get("steward_fix", {}),
+                    admission=states.get("admission", {}),
                 )
             )
         except Exception as exc:
@@ -172,6 +182,7 @@ def current_states(store) -> dict[str, dict]:
         "doctor": {"doctor", "migration"},
         "janitor": {"janitor", "migration"},
         "steward_fix": {"steward-fix", "migration"},
+        "admission": {"admission", "migration"},
     }
     states: dict[str, dict] = {}
     for name, expected in producers.items():
@@ -179,5 +190,13 @@ def current_states(store) -> dict[str, dict]:
         if store.read_json(filename, None) is None:
             states[name] = {}
             continue
-        states[name] = store.read_state(filename, {}, expected_producer=expected) or {}
+        try:
+            states[name] = store.read_state(filename, {}, expected_producer=expected) or {}
+        except StateBoundaryError as exc:
+            # Project is a projection over durable work, not a consumer that may
+            # act on a stale handoff. Expired receipts mean "not currently live".
+            # Integrity, identity, and producer failures still fail closed.
+            if "contract expired at" not in str(exc):
+                raise
+            states[name] = {}
     return states

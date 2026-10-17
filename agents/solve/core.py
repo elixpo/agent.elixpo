@@ -13,6 +13,7 @@ from typing import Any
 import httpx
 from lib.github.issues import fetch_issue_evidence, parse_issue_url, referenced_pull_requests
 from lib.solve_policy import is_test_repository
+from lib.state.contracts import StateBoundaryError
 from lib.state.ledger import Ledger
 from lib.state.store import StateStore
 from lib.workspace import Workspace
@@ -91,6 +92,24 @@ def resolve_target(store: StateStore, explicit_url: str | None, owned_test: bool
     url = str(pick["url"])
     if vet.get("url") != url or vet.get("suitable") is not True or vet.get("test_mode") is True:
         raise SolveRejected("Vet approval does not match the picked target")
+    try:
+        admission = store.read_state(
+            "admission.json",
+            {},
+            expected_producer="admission",
+            expected_run_id=str(vet.get("run_id") or "") if vet.get("run_id") else None,
+            expected_key=str(vet.get("key") or "") if vet.get("key") else None,
+            max_age=timedelta(days=7),
+        ) or {}
+    except StateBoundaryError as exc:
+        raise SolveRejected("the current Vet-approved target has no matching maintainer admission") from exc
+    if (
+        admission.get("status") != "approved"
+        or admission.get("issue_url") != url
+        or admission.get("run_id") != vet.get("run_id")
+        or admission.get("key") != vet.get("key")
+    ):
+        raise SolveRejected("the current Vet-approved target has no matching maintainer admission")
     return url
 
 

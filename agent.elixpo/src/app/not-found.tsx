@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { ArrowLeft, BookOpen, Building2, ExternalLink, GitBranch, Layers3, SearchX } from "lucide-react";
+import { Activity, ArrowLeft, BookOpen, ExternalLink, GitBranch, Grid3X3, SearchX } from "lucide-react";
 
 const destinations = [
-  { href: "/", label: "Building", description: "Return to live agent operations", icon: Building2 },
-  { href: "/floors", label: "Floors", description: "Browse operational domains", icon: Layers3 },
-  { href: "/docs", label: "Framework docs", description: "Build on the OreoFlow runtime", icon: BookOpen },
+  { href: "/", label: "Overview", description: "Return to live project operations", icon: Activity },
+  { href: "/floors", label: "Capabilities", description: "Browse bounded capability domains", icon: Grid3X3 },
+  { href: "/docs", label: "Elixpoo docs", description: "Read the v1 project-management contract", icon: BookOpen },
 ];
 
 export default function NotFound() {
@@ -22,9 +22,9 @@ export default function NotFound() {
 
         <div className="not-found-copy">
           <span className="not-found-eyebrow"><GitBranch size={14} /> Route not registered</span>
-          <h1>This room does not exist.</h1>
-          <p>The carrier reached the building, but no floor claims this address. Pick a known destination or return to operations.</p>
-          <Link className="not-found-primary" href="/"><ArrowLeft size={15} /> Back to the building</Link>
+          <h1>This route does not exist.</h1>
+          <p>No capability claims this address. Pick a registered destination or return to the live operations overview.</p>
+          <Link className="not-found-primary" href="/"><ArrowLeft size={15} /> Back to overview</Link>
         </div>
       </section>
 

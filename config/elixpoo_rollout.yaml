@@ -1,0 +1,31 @@
+schema_version: 1
+owner: elixpo
+runtime_repository: elixpo/agent.elixpo
+runtime_ref: v1
+repositories:
+  agent.elixpo: {triage: true, mentions: true, review: true, project: true, merge_memory: true, discussions_host: true}
+  elixpo: {triage: false, mentions: false, review: false, project: false, merge_memory: false, discussions_host: false, deferred: true}
+  lixrl.com: {triage: false, mentions: false, review: false, project: false, merge_memory: false, discussions_host: false, deferred: true}
+  .github: {deferred: true}
+  accounts.elixpo: {deferred: true}
+  admin.elixpo: {deferred: true}
+  blogs.elixpo: {deferred: true}
+  crumb.elixpo: {deferred: true}
+  cypher: {deferred: true}
+  elixpo_chapter: {deferred: true}
+  Kareixo: {deferred: true}
+  mails.elixpo: {deferred: true}
+  me.elixpo: {deferred: true}
+  monodiffuse: {deferred: true}
+  Nano28C64: {deferred: true}
+  octabit: {deferred: true}
+  opensource.elixpo: {deferred: true}
+  oreo: {deferred: true}
+  oreoPI: {deferred: true}
+  packages.elixpo: {deferred: true}
+  payouts.elixpo: {deferred: true}
+  qfabric: {deferred: true}
+  research.elixpo: {deferred: true}
+  sketch.elixpo: {deferred: true}
+  status.elixpo: {deferred: true}
+  wozformer: {deferred: true}

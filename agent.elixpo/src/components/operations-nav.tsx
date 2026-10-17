@@ -2,12 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { BookOpen, Building2, GitPullRequest, Layers3, Library, Play, Radio, ShieldCheck } from "lucide-react";
+import { Activity, BookOpen, GitPullRequest, Grid3X3, Library, Play, Radio, ShieldCheck } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { href: "/", label: "Building", icon: Building2 },
-  { href: "/floors", label: "Floors", icon: Layers3 },
+  { href: "/", label: "Overview", icon: Activity },
+  { href: "/floors", label: "Capabilities", icon: Grid3X3 },
   { href: "/runs", label: "Runs", icon: Play },
   { href: "/work", label: "Work", icon: GitPullRequest },
   { href: "/journal", label: "Journal", icon: BookOpen },
@@ -28,7 +28,7 @@ export function OperationsNav({ repositoryUrl }: { repositoryUrl: string }) {
     <header className="real-topbar">
       <Link className="real-brand" href="/">
         <Image src="/logo.png" alt="elixpoo" width={38} height={38} priority />
-        <span><strong>OreoFlow</strong><small>GitHub operations building</small></span>
+        <span><strong>Elixpoo</strong><small>GitHub project operations</small></span>
       </Link>
       <nav className="real-nav" aria-label="Operations">
         {links.map(({ href, label, icon: Icon }) => (

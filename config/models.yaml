@@ -1,6 +1,6 @@
 # Role -> Pollinations model. Squads request a ROLE; the rtk router resolves the
 # model. Swap models here without touching squad code. Names validated against
-# docs/model.txt (Pollinations /v1/models). See docs/refactor_plan.md section 5.
+# docs/model.txt (Pollinations /v1/models). Legacy role history is archived under docs/archive/.
 #
 # DEFAULTS ARE FREE-TIER (no paid_only models) so the system runs without pollen
 # balance. The stronger paid model for each role is noted inline — swap it in for

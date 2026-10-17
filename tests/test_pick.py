@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from agents.pick.select import is_eligible, justify, select_top
 from lib.state.contracts import StateContractRegistry
@@ -186,3 +186,20 @@ def test_no_pick_overwrites_stale_pick_output(tmp_path):
     assert result["picked"] is False
     assert result["reason"] == "no candidate passed score, easy-work, and ledger policy"
     assert "repo" not in result
+
+
+def test_pick_turns_expired_triage_queue_into_clean_no_pick(tmp_path):
+    from agents.pick.__main__ import run
+
+    store = StateStore(tmp_path)
+    now = datetime(2026, 8, 12, tzinfo=timezone.utc)
+    store.write_state(
+        "triaged.json",
+        [_t("o/r", 1, 20)],
+        producer="triage",
+        ttl=timedelta(hours=1),
+        now=now - timedelta(hours=2),
+    )
+
+    assert run(store, now=now) is None
+    assert store.read_json("pick.json")["reason"] == "triaged queue is empty"

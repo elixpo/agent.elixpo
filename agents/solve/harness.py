@@ -33,7 +33,7 @@ _CONTROL_ROOT = Path(__file__).resolve().parents[2]
 _CCR_PACKAGE = "@musistudio/claude-code-router@2.0.0"
 _HARNESS_PACKAGE = "@anthropic-ai/claude-code@2.1.220"
 _CCR_HOST = "127.0.0.1"
-_SOLVE_SKILL = _CONTROL_ROOT / "skills/solve-bounded-issue/SKILL.md"
+_SOLVE_SKILL = _CONTROL_ROOT / "docs/archive/autonomous-contributor/skills/solve-bounded-issue/SKILL.md"
 _TOOL_GATE = Path(__file__).with_name("tool_gate.py")
 _SECRET_MARKERS = ("TOKEN", "SECRET", "PASSWORD", "PRIVATE_KEY", "API_KEY")
 _CCR_WEB_TOKEN = re.compile(r"(?i)(ccr_web_token=)[^&\s]+")
