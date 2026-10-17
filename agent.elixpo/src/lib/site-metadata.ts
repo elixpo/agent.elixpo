@@ -2,16 +2,16 @@ import type { Metadata } from "next";
 
 export const SITE_URL = "https://agent.elixpo.com";
 export const SITE_NAME = "Elixpoo";
-export const SITE_TITLE = "Elixpoo · Live Project Operations";
+export const SITE_TITLE = "Elixpoo — GitHub Project Management Agent";
 export const SITE_DESCRIPTION =
-  "Follow Elixpo's public GitHub project-management agent: live triage, mentions, reviews, Project records, discussions, merge history, and safety activity.";
+  "Elixpoo is Elixpo's open-source GitHub project-management agent for bounded triage, exact mentions, pull-request review, Project V2 synchronization, Discussions, and merge memory.";
 
 export const SOCIAL_IMAGE = {
   url: "/default.png",
   width: 1280,
   height: 720,
   type: "image/png",
-  alt: "Elixpoo live project operations dashboard",
+  alt: "Elixpoo — bounded GitHub project management across Elixpo repositories",
 };
 
 export function absoluteUrl(path = "/") {
@@ -19,16 +19,15 @@ export function absoluteUrl(path = "/") {
 }
 
 export function pageMetadata(title: string, description: string, path: string): Metadata {
-  const socialTitle = `${title} | ${SITE_NAME}`;
-
+  const canonical = absoluteUrl(path);
   return {
     title,
     description,
-    alternates: { canonical: path },
+    alternates: { canonical },
     openGraph: {
-      title: socialTitle,
+      title: `${title} | ${SITE_NAME}`,
       description,
-      url: path,
+      url: canonical,
       siteName: SITE_NAME,
       locale: "en_US",
       type: "website",
@@ -36,7 +35,7 @@ export function pageMetadata(title: string, description: string, path: string): 
     },
     twitter: {
       card: "summary_large_image",
-      title: socialTitle,
+      title: `${title} | ${SITE_NAME}`,
       description,
       images: [SOCIAL_IMAGE.url],
     },
