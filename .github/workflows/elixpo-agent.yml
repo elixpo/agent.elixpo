@@ -1,9 +1,0 @@
-name: Legacy repository agent caller (inactive)
-on:
-  workflow_dispatch: {}
-permissions: {}
-jobs:
-  inactive:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo 'Use elixpoo-mentions.yml in Elixpoo v1.'

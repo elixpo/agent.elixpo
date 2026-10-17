@@ -29,7 +29,8 @@ See [`docs/elixpoo-v1.md`](docs/elixpoo-v1.md) for the runtime and authorization
 ## Local checks
 
 ```bash
-python -m pytest tests/test_elixpoo_v1.py tests/test_elixpoo_v1_workflows.py
+python -m pytest tests/test_elixpoo_v1.py tests/test_elixpoo_v1_workflows.py tests/test_rollout_prs.py
+python -m agents.rollout_prs
 python -m agents.rollout_audit --repo agent.elixpo
 ```
 
@@ -59,3 +60,4 @@ The rollout audit is read-only. Its source of truth is [`config/elixpoo_rollout.
 Exact fine-grained permissions are documented in [`distribution/README.md`](distribution/README.md).
 
 Historical Scout → Solve implementation remains available only as disconnected reference under [`docs/archive/autonomous-contributor`](docs/archive/autonomous-contributor/README.md).
+The exact final pre-v1 snapshot is tagged [`legacy-autonomous-contributor-v1`](https://github.com/elixpo/agent.elixpo/tree/legacy-autonomous-contributor-v1).

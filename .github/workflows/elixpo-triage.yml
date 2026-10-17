@@ -1,9 +1,0 @@
-name: Legacy triage caller (inactive)
-on:
-  workflow_dispatch: {}
-permissions: {}
-jobs:
-  inactive:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo 'Use elixpoo-triage.yml in Elixpoo v1.'

@@ -36,4 +36,4 @@ Elixpoo v1 is Elixpo's organization-wide GitHub project-management agent. It cla
 - Never commit to `main`; use `feat/<slug>` or `fix/<slug>` and conventional commits.
 - Do not touch maintainer `.env` files.
 
-Historical autonomous-contributor code is disconnected and documented under `docs/archive/autonomous-contributor/`. Do not reactivate it through new dispatch routes.
+Historical autonomous-contributor code is preserved by the `legacy-autonomous-contributor-v1` tag and documented under `docs/archive/autonomous-contributor/`. Do not reactivate it through new dispatch routes.

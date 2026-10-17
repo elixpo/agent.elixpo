@@ -44,8 +44,16 @@ export default function DocsPage() {
         <section className="docs-section">
           <div className="docs-section-heading"><small>Rollout</small><h2>Thin callers, pinned runtime</h2></div>
           <p className="docs-prose">Participating repositories install only the event callers from <code>distribution/workflows</code>. Each caller pins a reusable workflow in <code>elixpo/agent.elixpo</code> at <code>v1</code>. The canonical Discussions responder remains centralized and is not copied to every repository.</p>
-          <pre className="code-block"><code>python -m agents.rollout_audit{`\n`}python -m agents.rollout_audit --repo lixrl.com</code></pre>
-          <p className="docs-prose">The audit is read-only and compares <code>config/elixpoo_rollout.yaml</code> with live repository workflows. It reports missing, stale, deferred, excluded, and unexpected callers.</p>
+          <pre className="code-block"><code>python -m agents.rollout_prs{`\n`}python -m agents.rollout_prs --repo lixrl.com --apply{`\n`}python -m agents.rollout_audit</code></pre>
+          <p className="docs-prose">Rollout is dry-run by default. Apply mode opens one reviewable, idempotent pull request in each eligible repository; it never merges that PR. The separate audit reports missing, stale, excluded, and unexpected callers.</p>
+        </section>
+
+        <section className="docs-section">
+          <div className="docs-section-heading"><small>History</small><h2>The autonomous contributor is archived</h2></div>
+          <p className="docs-prose">The former Scout → Triage → Pick → Vet → Solve → Submit direction is preserved for research and implementation history, but it is not part of the supported v1 runtime.</p>
+          <div className="docs-hero-actions">
+            <a href="https://github.com/elixpo/agent.elixpo/tree/legacy-autonomous-contributor-v1" target="_blank" rel="noreferrer">Open the frozen legacy snapshot <ExternalLink size={14} /></a>
+          </div>
         </section>
       </section>
     </main>
