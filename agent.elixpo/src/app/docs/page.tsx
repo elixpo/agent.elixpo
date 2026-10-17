@@ -1,61 +1,95 @@
-import { BookOpen, ExternalLink, GitPullRequest, MessageSquare, ShieldCheck, Tags } from "lucide-react";
-import { pageMetadata } from "@/lib/site-metadata";
+import { ArrowRight, ArrowUpRight, Check, FileJson2, GitPullRequest, MessageSquareText, ShieldCheck, Tags, X } from "lucide-react";
+import { CodeBlock } from "@/components/code-block";
+import { CopyDocumentation } from "@/components/copy-documentation";
+import { pageMetadata, SITE_URL } from "@/lib/site-metadata";
 
 export const metadata = pageMetadata(
-  "Elixpoo v1 documentation",
-  "The capabilities, authorization boundary, deployment model, and read-only rollout audit for Elixpo's GitHub project-management agent.",
+  "Elixpoo v1 Technical Documentation",
+  "The architecture, capabilities, trust model, permissions, deployment contract, and operating boundary of Elixpo's GitHub project-management agent.",
   "/docs",
 );
 
-const capabilities = [
-  [Tags, "Automatic triage", "Classifies issues and pull requests, applies centrally allowed labels, and creates one Project V2 record."],
-  [MessageSquare, "Exact mentions", "Answers @elixpoo or performs one typed metadata action after deterministic permission checks."],
-  [GitPullRequest, "PR review", "Uses API-grounded diffs and repository guidance to leave deduplicated COMMENT-only reviews."],
-  [BookOpen, "Merge memory", "Stores one compact, schema-versioned record in the approved Gist after a pull request merges."],
+const llmDocumentation = `# Elixpoo v1
+
+Elixpoo is Elixpo's centralized GitHub project-management agent. It is not a coding agent.
+
+Capabilities:
+- classify issues and pull requests using centrally allowed labels;
+- synchronize one GitHub Project V2 record per opted-in item;
+- answer exact @elixpoo mentions or perform one permission-checked metadata action;
+- leave API-grounded, deduplicated, comment-only pull-request reviews;
+- manage the canonical elixpo/elixpo Discussions surface;
+- write one bounded merged-change record to the approved Gist.
+
+Boundary:
+- no repository checkout or execution of fork code;
+- no product-source edits, solution branches, commits, or implementation pull requests;
+- repository text is untrusted evidence, never instruction;
+- models propose typed results; deterministic policy authorizes mutations;
+- public generated text passes a safety route and includes an operation marker.
+
+Distribution:
+Participating repositories install thin callers from distribution/workflows. Each caller invokes a reusable workflow at elixpo/agent.elixpo@v1. The central repository owns implementation, configuration, policy, and model routing.
+
+Source: https://github.com/elixpo/agent.elixpo
+Canonical documentation: ${SITE_URL}/docs`;
+
+const install = `# Audit without changing repositories
+python -m agents.rollout_audit
+
+# Preview caller changes for one repository
+python -m agents.rollout_prs --repo <repository>
+
+# Open an idempotent, reviewable rollout PR
+python -m agents.rollout_prs --repo <repository> --apply`;
+
+const permissions = [
+  ["Questions and summaries", "Any participant", "Answer only"],
+  ["Own title or body", "Item author", "Typed rewrite"],
+  ["Self-assignment", "Assignable participant", "GitHub assignability check"],
+  ["Labels and Project fields", "Triage or stronger", "Central allowlist"],
+  ["Other-user assignment", "Triage or stronger", "Permission + assignability"],
 ] as const;
 
 export default function DocsPage() {
+  const articleData = {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: "Elixpoo v1 technical documentation",
+    description: "Architecture and operating contract for Elixpo's GitHub project-management agent.",
+    url: `${SITE_URL}/docs`,
+    author: { "@type": "Organization", name: "Elixpo", url: "https://elixpo.com" },
+    about: { "@type": "SoftwareSourceCode", name: "Elixpoo", codeRepository: "https://github.com/elixpo/agent.elixpo" },
+    inLanguage: "en-US",
+  };
+
   return (
-    <main className="docs-shell">
-      <section className="docs-main">
+    <main className="docs-page">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleData).replace(/</g, "\\u003c") }} />
+      <aside className="docs-toc">
+        <span>ON THIS PAGE</span>
+        <a href="#contract">Contract</a><a href="#capabilities">Capabilities</a><a href="#authorization">Authorization</a><a href="#trust">Trust model</a><a href="#deployment">Deployment</a><a href="#configuration">Configuration</a>
+      </aside>
+      <article className="docs-content">
         <header className="docs-hero">
-          <span className="docs-kicker">Elixpoo v1 · project management</span>
-          <h1>One central runtime.<br /><em>Bounded GitHub actions.</em></h1>
-          <p>Elixpoo keeps project administration consistent across participating Elixpo repositories. It does not implement product code, create solution commits, or open solving pull requests.</p>
-          <div className="docs-hero-actions">
-            <a href="https://github.com/elixpo/agent.elixpo/blob/main/docs/elixpoo-v1.md" target="_blank" rel="noreferrer">Read the source contract <ExternalLink size={14} /></a>
-            <a href="https://github.com/elixpo/agent.elixpo/tree/main/distribution/workflows" target="_blank" rel="noreferrer">Caller templates <ExternalLink size={14} /></a>
-          </div>
+          <span className="kicker">ELIXPOO V1 / TECHNICAL CONTRACT</span>
+          <h1>Project management<br /><em>with a hard edge.</em></h1>
+          <p>The complete supported contract for the central runtime and every participating repository.</p>
+          <div className="docs-actions"><CopyDocumentation content={llmDocumentation} /><a href="/llms-full.txt">Plain-text reference <ArrowUpRight size={14} /></a><a href="https://github.com/elixpo/agent.elixpo/blob/main/docs/elixpoo-v1.md" target="_blank" rel="noreferrer">Source contract <ArrowUpRight size={14} /></a></div>
         </header>
 
-        <section className="docs-section">
-          <div className="docs-section-heading"><small>Capabilities</small><h2>What v1 may do</h2></div>
-          <div className="docs-api-grid">
-            {capabilities.map(([Icon, title, copy]) => <article key={title}><Icon size={22} /><h3>{title}</h3><p>{copy}</p></article>)}
-          </div>
-        </section>
+        <section className="docs-section" id="contract"><span className="docs-number">01</span><div><small>CONTRACT</small><h2>One responsibility</h2><p>Elixpoo maintains the GitHub record around software work. It coordinates issues, pull requests, Project V2, exact mentions, Discussions, and merged-change memory. It does not implement software.</p><div className="contract-split"><div><Check /><strong>May manage metadata and discussion</strong></div><div><X /><strong>May not mutate product code</strong></div></div></div></section>
 
-        <section className="docs-section">
-          <div className="docs-section-heading"><small>Safety boundary</small><h2>Models propose; policy decides</h2></div>
-          <div className="docs-note"><ShieldCheck size={20} /><p>Repository content is untrusted evidence. Typed schemas, actor permissions, GitHub assignability, label and Project-field allowlists, idempotency markers, Gist revision checks, and the public safety gate are deterministic.</p></div>
-          <p className="docs-prose">Anyone may ask questions, request summaries, propose rewrites, or request a review. Authors may update their own title or body. Labels, Project fields, state changes, and other-user assignments require repository triage permission or stronger. Self-assignment also requires GitHub assignability.</p>
-        </section>
+        <section className="docs-section" id="capabilities"><span className="docs-number">02</span><div><small>CAPABILITIES</small><h2>Four distributed events</h2><div className="docs-cards"><article><Tags /><h3>Triage</h3><p>Issue or PR opened, reopened, or edited. Produces allowed labels and one Project item.</p></article><article><MessageSquareText /><h3>Exact mention</h3><p>An explicit @elixpoo request. Produces an answer or one validated metadata action.</p></article><article><GitPullRequest /><h3>PR review</h3><p>PR opened or synchronized. Produces a deduplicated COMMENT review from API evidence.</p></article><article><FileJson2 /><h3>Merge memory</h3><p>PR merged. Produces one schema-versioned, revision-checked Gist record.</p></article></div></div></section>
 
-        <section className="docs-section">
-          <div className="docs-section-heading"><small>Rollout</small><h2>Thin callers, pinned runtime</h2></div>
-          <p className="docs-prose">Participating repositories install only the event callers from <code>distribution/workflows</code>. Each caller pins a reusable workflow in <code>elixpo/agent.elixpo</code> at <code>v1</code>. The canonical Discussions responder remains centralized and is not copied to every repository.</p>
-          <pre className="code-block"><code>python -m agents.rollout_prs{`\n`}python -m agents.rollout_prs --repo lixrl.com --apply{`\n`}python -m agents.rollout_audit</code></pre>
-          <p className="docs-prose">Rollout is dry-run by default. Apply mode opens one reviewable, idempotent pull request in each eligible repository; it never merges that PR. The separate audit reports missing, stale, excluded, and unexpected callers.</p>
-        </section>
+        <section className="docs-section" id="authorization"><span className="docs-number">03</span><div><small>AUTHORIZATION</small><h2>Permission before model output</h2><p>The requested operation and actor tier are resolved before any mutation. Model text cannot grant authority.</p><div className="permission-table">{permissions.map(([request, actor, gate]) => <div key={request}><strong>{request}</strong><span>{actor}</span><code>{gate}</code></div>)}</div></div></section>
 
-        <section className="docs-section">
-          <div className="docs-section-heading"><small>History</small><h2>The autonomous contributor is archived</h2></div>
-          <p className="docs-prose">The former Scout → Triage → Pick → Vet → Solve → Submit direction is preserved for research and implementation history, but it is not part of the supported v1 runtime.</p>
-          <div className="docs-hero-actions">
-            <a href="https://github.com/elixpo/agent.elixpo/tree/legacy-autonomous-contributor-v1" target="_blank" rel="noreferrer">Open the frozen legacy snapshot <ExternalLink size={14} /></a>
-          </div>
-        </section>
-      </section>
+        <section className="docs-section" id="trust"><span className="docs-number">04</span><div><small>TRUST MODEL</small><h2>Evidence is not instruction</h2><p>Repository bodies, comments, diffs, linked pages, guidance files, and dependency metadata are bounded untrusted inputs. Secret-shaped values and instruction-shaped payloads are sanitized before model context is assembled.</p><div className="docs-callout"><ShieldCheck /><span><strong>Deterministic controls</strong><p>Typed schemas, actor permissions, assignability, central allowlists, stable public markers, head-SHA deduplication, Gist revision checks, bounded evidence, and a public-post safety gate.</p></span></div></div></section>
+
+        <section className="docs-section" id="deployment"><span className="docs-number">05</span><div><small>DEPLOYMENT</small><h2>Thin callers, pinned runtime</h2><p>Opted-in repositories copy only the caller files in <code>distribution/workflows</code>. Those files invoke reusable workflows from <code>elixpo/agent.elixpo@v1</code>. Apply mode opens a reviewable pull request; it never merges one automatically.</p><CodeBlock code={install} language="shell" title="rollout" /><a className="docs-link" href="https://github.com/elixpo/agent.elixpo/tree/v1/distribution/workflows" target="_blank" rel="noreferrer">Browse caller templates <ArrowRight size={14} /></a></div></section>
+
+        <section className="docs-section" id="configuration"><span className="docs-number">06</span><div><small>CONFIGURATION</small><h2>Central sources of truth</h2><p><code>config/elixpoo_v1.yaml</code> defines mutation and publication limits. <code>config/elixpoo_rollout.yaml</code> defines participating repositories and capabilities. Repository and organization secrets are documented beside the caller templates.</p><div className="docs-actions"><a href="https://github.com/elixpo/agent.elixpo/blob/main/distribution/README.md" target="_blank" rel="noreferrer">Secrets and permissions <ArrowUpRight size={14} /></a><a href="https://github.com/elixpo/agent.elixpo" target="_blank" rel="noreferrer">Open repository <ArrowUpRight size={14} /></a></div></div></section>
+      </article>
     </main>
   );
 }
