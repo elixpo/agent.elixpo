@@ -1,9 +1,0 @@
-name: Legacy Steward approval (inactive)
-on:
-  workflow_dispatch: {}
-permissions: {}
-jobs:
-  inactive:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo 'Inactive in Elixpoo v1; metadata actions use the central mention workflow.'

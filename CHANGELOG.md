@@ -1,5 +1,13 @@
 # Changelog
 
+## v1 — Project-management runtime
+
+- Replace the autonomous code-contribution pipeline with bounded triage,
+  exact mentions, COMMENT-only review, Project V2 synchronization, canonical
+  Discussions, and merge memory.
+- Publish thin repository callers pinned to the centralized `v1` runtime.
+- Preserve the retired direction at `legacy-autonomous-contributor-v1`.
+
 ## 1.2.1 — 2026-08-12
 
 First stable OreoFlow framework release.

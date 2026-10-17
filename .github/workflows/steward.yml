@@ -1,9 +1,0 @@
-name: Legacy Steward polling (inactive)
-on:
-  workflow_dispatch: {}
-permissions: {}
-jobs:
-  inactive:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo 'Inactive in Elixpoo v1; mentions are event-driven and never dispatch coding work.'

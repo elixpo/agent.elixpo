@@ -1,9 +1,0 @@
-name: Legacy autonomous Project reconciliation (inactive)
-on:
-  workflow_dispatch: {}
-permissions: {}
-jobs:
-  inactive:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo 'Inactive in Elixpoo v1; triage writes Project V2 records directly.'

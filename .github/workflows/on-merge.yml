@@ -1,9 +1,0 @@
-name: Legacy merge caller (inactive)
-on:
-  workflow_dispatch: {}
-permissions: {}
-jobs:
-  inactive:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo 'Use elixpoo-merge-memory.yml in Elixpoo v1.'

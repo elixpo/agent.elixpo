@@ -1,9 +1,0 @@
-name: Legacy Steward terminal reconciliation (inactive)
-on:
-  workflow_dispatch: {}
-permissions: {}
-jobs:
-  inactive:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo 'Inactive in Elixpoo v1; merged changes use the merge-memory workflow.'

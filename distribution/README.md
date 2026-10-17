@@ -24,3 +24,21 @@ Required organization/repository secrets:
 
 Never add `pull_request_target`; reviews inspect API evidence and never check out
 or execute contributor code.
+
+## Central rollout
+
+The control repository can prepare the same reviewable change without copying
+runtime code or cloning target repositories:
+
+```bash
+python -m agents.rollout_prs
+python -m agents.rollout_prs --repo lixrl.com --apply
+```
+
+Dry-run is the default. `--apply` creates an idempotent branch and pull request
+through the GitHub API. The `Elixpoo v1 rollout PRs` workflow exposes the same
+operation through `workflow_dispatch`; it never merges the target pull request.
+Set `ELIXPOO_GITHUB_ROLLOUT_TOKEN` only in the control repository. Use a GitHub
+App installation token or fine-grained token covering the target repositories
+with Metadata read, Contents read/write, and Pull requests read/write. A classic
+token also needs `workflow` to create files under `.github/workflows/`.
