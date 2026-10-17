@@ -4,12 +4,12 @@ import { CopyDocumentation } from "@/components/copy-documentation";
 import { pageMetadata, SITE_URL } from "@/lib/site-metadata";
 
 export const metadata = pageMetadata(
-  "Elixpoo v1 Technical Documentation",
+  "Elixpoo v2 Technical Documentation",
   "The architecture, capabilities, trust model, permissions, deployment contract, and operating boundary of Elixpo's GitHub project-management agent.",
   "/docs",
 );
 
-const llmDocumentation = `# Elixpoo v1
+const llmDocumentation = `# Elixpoo v2
 
 Elixpoo is Elixpo's centralized GitHub project-management agent. It is not a coding agent.
 
@@ -29,7 +29,7 @@ Boundary:
 - public generated text passes a safety route and includes an operation marker.
 
 Distribution:
-Participating repositories install thin callers from distribution/workflows. Each caller invokes a reusable workflow at elixpo/agent.elixpo@v1. The central repository owns implementation, configuration, policy, and model routing.
+Participating repositories install thin callers from distribution/workflows. Each caller invokes a reusable workflow at elixpo/agent.elixpo@v2. The central repository owns implementation, configuration, policy, and model routing.
 
 Source: https://github.com/elixpo/agent.elixpo
 Canonical documentation: ${SITE_URL}/docs`;
@@ -55,7 +55,7 @@ export default function DocsPage() {
   const articleData = {
     "@context": "https://schema.org",
     "@type": "TechArticle",
-    headline: "Elixpoo v1 technical documentation",
+    headline: "Elixpoo v2 technical documentation",
     description: "Architecture and operating contract for Elixpo's GitHub project-management agent.",
     url: `${SITE_URL}/docs`,
     author: { "@type": "Organization", name: "Elixpo", url: "https://elixpo.com" },
@@ -72,10 +72,10 @@ export default function DocsPage() {
       </aside>
       <article className="docs-content">
         <header className="docs-hero">
-          <span className="kicker">ELIXPOO V1 / TECHNICAL CONTRACT</span>
+          <span className="kicker">ELIXPOO V2 / TECHNICAL CONTRACT</span>
           <h1>Project management<br /><em>with a hard edge.</em></h1>
           <p>The complete supported contract for the central runtime and every participating repository.</p>
-          <div className="docs-actions"><CopyDocumentation content={llmDocumentation} /><a href="/llms-full.txt">Plain-text reference <ArrowUpRight size={14} /></a><a href="https://github.com/elixpo/agent.elixpo/blob/main/docs/elixpoo-v1.md" target="_blank" rel="noreferrer">Source contract <ArrowUpRight size={14} /></a></div>
+          <div className="docs-actions"><CopyDocumentation content={llmDocumentation} /><a href="/llms-full.txt">Plain-text reference <ArrowUpRight size={14} /></a><a href="https://github.com/elixpo/agent.elixpo/blob/main/docs/elixpoo-v2.md" target="_blank" rel="noreferrer">Source contract <ArrowUpRight size={14} /></a></div>
         </header>
 
         <section className="docs-section" id="contract"><span className="docs-number">01</span><div><small>CONTRACT</small><h2>One responsibility</h2><p>Elixpoo maintains the GitHub record around software work. It coordinates issues, pull requests, Project V2, exact mentions, Discussions, and merged-change memory. It does not implement software.</p><div className="contract-split"><div><Check /><strong>May manage metadata and discussion</strong></div><div><X /><strong>May not mutate product code</strong></div></div></div></section>
@@ -86,9 +86,9 @@ export default function DocsPage() {
 
         <section className="docs-section" id="trust"><span className="docs-number">04</span><div><small>TRUST MODEL</small><h2>Evidence is not instruction</h2><p>Repository bodies, comments, diffs, linked pages, guidance files, and dependency metadata are bounded untrusted inputs. Secret-shaped values and instruction-shaped payloads are sanitized before model context is assembled.</p><div className="docs-callout"><ShieldCheck /><span><strong>Deterministic controls</strong><p>Typed schemas, actor permissions, assignability, central allowlists, stable public markers, head-SHA deduplication, Gist revision checks, bounded evidence, and a public-post safety gate.</p></span></div></div></section>
 
-        <section className="docs-section" id="deployment"><span className="docs-number">05</span><div><small>DEPLOYMENT</small><h2>Thin callers, pinned runtime</h2><p>Opted-in repositories copy only the caller files in <code>distribution/workflows</code>. Those files invoke reusable workflows from <code>elixpo/agent.elixpo@v1</code>. Apply mode opens a reviewable pull request; it never merges one automatically.</p><CodeBlock code={install} language="shell" title="rollout" /><a className="docs-link" href="https://github.com/elixpo/agent.elixpo/tree/v1/distribution/workflows" target="_blank" rel="noreferrer">Browse caller templates <ArrowRight size={14} /></a></div></section>
+        <section className="docs-section" id="deployment"><span className="docs-number">05</span><div><small>DEPLOYMENT</small><h2>Thin callers, pinned runtime</h2><p>Opted-in repositories copy only the caller files in <code>distribution/workflows</code>. Those files invoke reusable workflows from <code>elixpo/agent.elixpo@v2</code>. Apply mode opens a reviewable pull request; it never merges one automatically.</p><CodeBlock code={install} language="shell" title="rollout" /><a className="docs-link" href="https://github.com/elixpo/agent.elixpo/tree/v2/distribution/workflows" target="_blank" rel="noreferrer">Browse caller templates <ArrowRight size={14} /></a></div></section>
 
-        <section className="docs-section" id="configuration"><span className="docs-number">06</span><div><small>CONFIGURATION</small><h2>Central sources of truth</h2><p><code>config/elixpoo_v1.yaml</code> defines mutation and publication limits. <code>config/elixpoo_rollout.yaml</code> defines participating repositories and capabilities. Repository and organization secrets are documented beside the caller templates.</p><div className="docs-actions"><a href="https://github.com/elixpo/agent.elixpo/blob/main/distribution/README.md" target="_blank" rel="noreferrer">Secrets and permissions <ArrowUpRight size={14} /></a><a href="https://github.com/elixpo/agent.elixpo" target="_blank" rel="noreferrer">Open repository <ArrowUpRight size={14} /></a></div></div></section>
+        <section className="docs-section" id="configuration"><span className="docs-number">06</span><div><small>CONFIGURATION</small><h2>Central sources of truth</h2><p><code>config/elixpoo_v2.yaml</code> defines mutation and publication limits. <code>config/elixpoo_rollout.yaml</code> defines participating repositories and capabilities. Repository and organization secrets are documented beside the caller templates.</p><div className="docs-actions"><a href="https://github.com/elixpo/agent.elixpo/blob/main/distribution/README.md" target="_blank" rel="noreferrer">Secrets and permissions <ArrowUpRight size={14} /></a><a href="https://github.com/elixpo/agent.elixpo" target="_blank" rel="noreferrer">Open repository <ArrowUpRight size={14} /></a></div></div></section>
       </article>
     </main>
   );

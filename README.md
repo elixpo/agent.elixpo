@@ -2,7 +2,7 @@
 
 Elixpoo is Elixpo's organization-wide GitHub project-management agent. One central runtime keeps routine repository administration consistent without becoming a coding agent.
 
-Elixpoo v1 can:
+Elixpoo v2 can:
 
 - classify issues and pull requests with a centrally allowed label taxonomy;
 - add each opted-in item to GitHub Project V2 and update supported fields;
@@ -24,12 +24,12 @@ Participating repositories install thin callers from [`distribution/workflows`](
 
 Permissions, label and Project-field allowlists, idempotency, revision checks, and mutation authorization are deterministic. Pollinations models are reached only through `rtk.Router` for classification, rewriting, summaries, answers, and review reasoning. Public generated text passes the safety route before publication.
 
-See [`docs/elixpoo-v1.md`](docs/elixpoo-v1.md) for the runtime and authorization contract and [`docs/elixpoo-v1-audit.md`](docs/elixpoo-v1-audit.md) for the migration audit.
+See [`docs/elixpoo-v2.md`](docs/elixpoo-v2.md) for the runtime and authorization contract and [`docs/elixpoo-v2-audit.md`](docs/elixpoo-v2-audit.md) for the migration audit.
 
 ## Local checks
 
 ```bash
-python -m pytest tests/test_elixpoo_v1.py tests/test_elixpoo_v1_workflows.py tests/test_rollout_prs.py
+python -m pytest tests/test_elixpoo_v2.py tests/test_elixpoo_v2_workflows.py tests/test_rollout_prs.py
 python -m agents.rollout_prs
 python -m agents.rollout_audit --repo agent.elixpo
 ```
@@ -40,12 +40,12 @@ The rollout audit is read-only. Its source of truth is [`config/elixpoo_rollout.
 
 | Path | Purpose |
 | --- | --- |
-| `agents/elixpoo_v1/` | Central triage, mention, review, Project, and merge-memory runtime |
-| `skills/` | Focused v1 operating contracts |
+| `agents/elixpoo_v2/` | Central triage, mention, review, Project, and merge-memory runtime |
+| `skills/` | Focused v2 operating contracts |
 | `rtk/` | Pollinations routing, budgets, compression, cache, and ledger |
 | `lib/` | GitHub, state, configuration, and shared deterministic plumbing |
 | `distribution/workflows/` | Copy-ready callers for participating repositories |
-| `config/elixpoo_v1.yaml` | Metadata allowlists and public limits |
+| `config/elixpoo_v2.yaml` | Metadata allowlists and public limits |
 | `config/elixpoo_rollout.yaml` | Organization rollout manifest |
 | `agent.elixpo/` | Read-only public operations dashboard |
 

@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 import pytest
-from agents.elixpoo_v1.core import (
+from agents.elixpoo_v2.core import (
     MetadataAction,
     PermissionTier,
     authorize_action,
@@ -17,7 +17,7 @@ from agents.elixpoo_v1.core import (
     sanitize_evidence,
     validate_allowlists,
 )
-from agents.elixpoo_v1.memory import MergeRecord, remember_merge
+from agents.elixpoo_v2.memory import MergeRecord, remember_merge
 from agents.rollout_audit.core import inspect_callers, load_manifest
 from lib.github.gists import GistConflictError, GistSnapshot, RevisionedGist
 from pydantic import ValidationError
@@ -145,7 +145,7 @@ async def test_gist_revision_conflict_is_not_overwritten() -> None:
 
 def test_rollout_manifest_and_caller_detection() -> None:
     manifest = load_manifest(ROOT / "config/elixpoo_rollout.yaml")
-    body = "uses: elixpo/agent.elixpo/.github/workflows/elixpoo-triage-reusable.yml@v1"
+    body = "uses: elixpo/agent.elixpo/.github/workflows/elixpoo-triage-reusable.yml@v2"
     result = inspect_callers(
         {"triage": True}, {"elixpoo-triage.yml": body}, manifest["runtime_repository"], manifest["runtime_ref"]
     )
@@ -160,7 +160,7 @@ def test_discussion_markers_remain_idempotent() -> None:
 
 
 def test_review_runtime_uses_api_evidence_without_checkout() -> None:
-    text = (ROOT / "agents/elixpoo_v1/__main__.py").read_text()
+    text = (ROOT / "agents/elixpoo_v2/__main__.py").read_text()
     assert "get_pull_diff" in text
     assert "get_pull_files" in text
     assert "git clone" not in text

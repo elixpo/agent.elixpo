@@ -1,4 +1,4 @@
-"""Typed v1 actions, authorization, refusal, and idempotency primitives."""
+"""Typed v2 actions, authorization, refusal, and idempotency primitives."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from lib.elixpoo_policy import CODING_REFUSAL_TEXT, is_coding_request_text
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 DISCLOSURE = "_Posted by @elixpoo, Elixpo's automated project-management agent._"
-PUBLIC_MARKER_PREFIX = "<!-- elixpoo:v1:"
+PUBLIC_MARKER_PREFIX = "<!-- elixpoo:v2:"
 _MENTION = re.compile(r"(?<![A-Za-z0-9_.+\-])@elixpoo(?![A-Za-z0-9_.+\-])", re.IGNORECASE)
 _INJECTION = re.compile(
     r"(?im)^\s*(system|assistant|developer)\s*:|ignore (all|any|the|your) .*instructions|"

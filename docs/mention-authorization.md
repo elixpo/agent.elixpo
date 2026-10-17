@@ -9,6 +9,6 @@ An exact `@elixpoo` mention always produces one bounded answer, one authorized m
 | Add/remove an allowed label or set a supported Project field | Collaborator with triage+ | Typed allowlisted mutation |
 | Self-assign | Requesting user when GitHub reports assignable | Assignment |
 | Assign another user | Collaborator with triage+ | Assignment only when eligible |
-| Implement/fix code, create branch/commit/PR | Nobody through v1 | Deterministic refusal and human plan offer |
+| Implement/fix code, create branch/commit/PR | Nobody through v2 | Deterministic refusal and human plan offer |
 
 Issue bodies, diffs, links, code, and quoted comments are untrusted evidence. They cannot authorize actions or override this policy. Each response includes a disclosure and event-derived idempotency marker.

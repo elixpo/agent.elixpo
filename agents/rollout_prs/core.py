@@ -1,4 +1,4 @@
-"""Plan and publish idempotent Elixpoo v1 caller pull requests."""
+"""Plan and publish idempotent Elixpoo v2 caller pull requests."""
 
 from __future__ import annotations
 
@@ -130,7 +130,7 @@ async def publish(api, root: Path, manifest: dict[str, Any], plan: RolloutPlan) 
     config = (manifest.get("repositories") or {}).get(repo) or {}
     desired = desired_callers(root, config)
     digest = rollout_digest(desired)
-    branch = f"chore/elixpoo-v1-{digest[:10]}"
+    branch = f"chore/elixpoo-v2-{digest[:10]}"
     if not plan.changes:
         return {"repository": f"{owner}/{repo}", "status": "current"}
 
@@ -149,22 +149,22 @@ async def publish(api, root: Path, manifest: dict[str, Any], plan: RolloutPlan) 
         blob = await api.create_blob(owner, repo, change.content)
         entries.append({"path": change.path, "mode": "100644", "type": "blob", "sha": blob["sha"]})
     tree = await api.create_tree(owner, repo, base_tree, entries)
-    commit = await api.create_commit(owner, repo, "chore: install Elixpoo v1 callers", str(tree["sha"]), [base_sha])
+    commit = await api.create_commit(owner, repo, "chore: install Elixpoo v2 callers", str(tree["sha"]), [base_sha])
     await api.create_ref(owner, repo, f"refs/heads/{branch}", str(commit["sha"]))
     body = (
-        "Installs the thin event callers for the centralized `elixpo/agent.elixpo@v1` project-management runtime. "
+        "Installs the thin event callers for the centralized `elixpo/agent.elixpo@v2` project-management runtime. "
         "No agent implementation or product-code automation is copied into this repository.\n\n"
         "Capabilities enabled by this PR:\n"
         + "\n".join(f"- `{name}`" for name in CALLERS if config.get(name))
         + "\n\nRequired organization secrets and Project variables are documented in "
-        "[`distribution/README.md`](https://github.com/elixpo/agent.elixpo/blob/v1/distribution/README.md).\n\n"
+        "[`distribution/README.md`](https://github.com/elixpo/agent.elixpo/blob/v2/distribution/README.md).\n\n"
         f"Caller bundle: `{digest[:12]}`. Review repository-specific permissions before merging.\n\n"
         "<sub>@elixpoo</sub>"
     )
     pull = await api.create_pull(
         owner,
         repo,
-        "[CHORE] Install Elixpoo v1 project workflows",
+        "[CHORE] Install Elixpoo v2 project workflows",
         body,
         branch,
         default_branch,

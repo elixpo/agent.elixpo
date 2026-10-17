@@ -1,4 +1,4 @@
-# Elixpoo v1 secrets
+# Elixpoo v2 secrets
 
 Configure these as organization secrets shared only with participating repositories, or as repository secrets where narrower access is preferred.
 
@@ -11,4 +11,4 @@ Configure these as organization secrets shared only with participating repositor
 | `ELIXPOO_FOLLOWUP_GIST_ID` | Identifier, not a credential | approved Gist selection |
 | `ELIXPOO_GITHUB_DISCUSSIONS_TOKEN` | metadata read; Discussions read/write on `elixpo/elixpo` | canonical Discussions workflow |
 
-Set `ELIXPO_GITHUB_PROJECT_OWNER` and `ELIXPO_GITHUB_PROJECT_NUMBER` as Actions variables. Never expose a solver/fork token to v1 callers; Elixpoo v1 does not create branches, commits, or solving pull requests.
+Set `ELIXPO_GITHUB_PROJECT_OWNER` and `ELIXPO_GITHUB_PROJECT_NUMBER` as Actions variables. Never expose a solver/fork token to v2 callers; Elixpoo v2 does not create branches, commits, or solving pull requests.

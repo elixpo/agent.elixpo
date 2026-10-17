@@ -29,7 +29,7 @@ Return `PullReview.summary` plus typed findings: severity (`blocking` or
 ## Authorization and idempotency
 
 Anyone may request a review. Never check out or execute fork code. Deduplicate
-with `<!-- elixpoo:v1:review:<head-sha> -->`.
+with `<!-- elixpoo:v2:review:<head-sha> -->`.
 
 ## Refuse
 

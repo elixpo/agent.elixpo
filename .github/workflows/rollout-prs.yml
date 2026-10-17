@@ -1,4 +1,4 @@
-name: Elixpoo v1 rollout PRs
+name: Elixpoo v2 rollout PRs
 
 on:
   workflow_dispatch:
@@ -17,7 +17,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: elixpoo-v1-rollout-prs
+  group: elixpoo-v2-rollout-prs
   cancel-in-progress: false
 
 jobs:

@@ -1,4 +1,4 @@
-"""Idempotent Project V2 records for Elixpoo v1 triage."""
+"""Idempotent Project V2 records for Elixpoo v2 triage."""
 
 from __future__ import annotations
 

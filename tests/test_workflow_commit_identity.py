@@ -1,9 +1,9 @@
-"""Elixpoo v1 workflows never create repository commits."""
+"""Elixpoo v2 workflows never create repository commits."""
 
 from pathlib import Path
 
 
-def test_v1_callers_have_no_commit_or_push_path():
+def test_v2_callers_have_no_commit_or_push_path():
     root = Path(".github/workflows")
     for name in (
         "elixpoo-triage.yml",

@@ -44,7 +44,7 @@ class API:
         return {"sha": "tree-new"}
 
     async def create_commit(self, owner, repo, message, tree, parents):
-        assert message == "chore: install Elixpoo v1 callers"
+        assert message == "chore: install Elixpoo v2 callers"
         return {"sha": "commit-new"}
 
     async def create_ref(self, owner, repo, ref, sha):
@@ -60,7 +60,7 @@ def manifest() -> dict:
     return {
         "owner": "elixpo",
         "runtime_repository": "elixpo/agent.elixpo",
-        "runtime_ref": "v1",
+        "runtime_ref": "v2",
         "repositories": {
             "agent.elixpo": {"triage": True},
             "alpha": {"triage": True, "mentions": True},

@@ -1,7 +1,7 @@
 schema_version: 1
 owner: elixpo
 runtime_repository: elixpo/agent.elixpo
-runtime_ref: v1
+runtime_ref: v2
 repositories:
   agent.elixpo: {triage: true, mentions: true, review: true, project: true, merge_memory: true, discussions_host: true}
   elixpo: {triage: true, mentions: true, review: true, project: true, merge_memory: true, discussions_host: false}

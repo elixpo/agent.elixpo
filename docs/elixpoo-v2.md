@@ -1,8 +1,8 @@
-# Elixpoo v1 architecture
+# Elixpoo v2 architecture
 
 ## Contract
 
-Elixpoo v1 manages GitHub project records; it does not modify product code. Four event-driven capabilities share one central Python runtime and are invoked through pinned reusable workflows.
+Elixpoo v2 manages GitHub project records; it does not modify product code. Four event-driven capabilities share one central Python runtime and are invoked through pinned reusable workflows.
 
 | Event | Deterministic boundary | Model contribution | Mutation |
 | --- | --- | --- | --- |
@@ -19,7 +19,7 @@ Forked pull requests are reviewed from GitHub API metadata and diffs. V1 neither
 
 ## Deployment
 
-Copy only the relevant files from `distribution/workflows/` into an opted-in repository. Keep the reusable call pinned to the approved `v1` ref. Configure repository tokens and Project variables as described in `distribution/README.md`, then enable the corresponding capability in `config/elixpoo_rollout.yaml`.
+Copy only the relevant files from `distribution/workflows/` into an opted-in repository. Keep the reusable call pinned to the approved `v2` ref. Configure repository tokens and Project variables as described in `distribution/README.md`, then enable the corresponding capability in `config/elixpoo_rollout.yaml`.
 
 Run `python -m agents.rollout_audit` to compare that manifest with live workflow files. It reports current, missing, stale, deferred, excluded, and unexpected callers without changing repositories.
 

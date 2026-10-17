@@ -4,7 +4,7 @@ import importlib.util
 import json
 from pathlib import Path
 
-from agents.elixpoo_v1.core import sanitize_evidence
+from agents.elixpoo_v2.core import sanitize_evidence
 
 
 def _audit_module():
