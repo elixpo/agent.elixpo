@@ -2,8 +2,8 @@ import { LiveDashboard } from "@/components/live-dashboard";
 import { pageMetadata } from "@/lib/site-metadata";
 
 export const metadata = pageMetadata(
-  "Agent Floor Directory",
-  "Explore Elixpoo's repository activity, project-management workflow floor, and canonical community Discussions floor.",
+  "Capability Map",
+  "Explore Elixpoo's repository signals, bounded project-management runtime, and canonical community protocol.",
   "/floors",
 );
 

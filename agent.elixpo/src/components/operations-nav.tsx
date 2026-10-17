@@ -2,12 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { BookOpen, Building2, GitPullRequest, Layers3, Library, Play, Radio, ShieldCheck } from "lucide-react";
+import { Activity, BookOpen, GitPullRequest, Grid3X3, Library, Play, Radio, ShieldCheck } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { href: "/", label: "Building", icon: Building2 },
-  { href: "/floors", label: "Floors", icon: Layers3 },
+  { href: "/", label: "Overview", icon: Activity },
+  { href: "/floors", label: "Capabilities", icon: Grid3X3 },
   { href: "/runs", label: "Runs", icon: Play },
   { href: "/work", label: "Work", icon: GitPullRequest },
   { href: "/journal", label: "Journal", icon: BookOpen },
