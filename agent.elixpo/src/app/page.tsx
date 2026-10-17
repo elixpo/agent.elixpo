@@ -1,9 +1,9 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
   ArrowUpRight,
   BookOpen,
-  Bot,
   Braces,
   Check,
   CircleDot,
@@ -40,7 +40,7 @@ export default function Home() {
     <main>
       <section className="hero shell">
         <div className="hero-copy">
-          <span className="kicker"><CircleDot size={13} /> ELIXPOO V1 · OPEN SOURCE</span>
+          <span className="kicker"><CircleDot size={13} /> ELIXPOO V2 · OPEN SOURCE</span>
           <h1>One agent for the<br /><em>project around the code.</em></h1>
           <p>{SITE_DESCRIPTION}</p>
           <div className="hero-actions">
@@ -55,7 +55,14 @@ export default function Home() {
           <span className="graphic-label graphic-label-out">BOUNDED ACTIONS</span>
           <div className="graphic-node node-event"><Github size={21} /><small>event</small></div>
           <div className="graphic-line line-one"><i /></div>
-          <div className="graphic-core"><span><Bot size={31} /></span><strong>ELIXPOO</strong><small>central policy runtime</small></div>
+          <div className="graphic-core">
+            <span className="graphic-logo-shell">
+              <Image className="graphic-logo" src="/logo.png" width={104} height={104} alt="Elixpoo panda agent" priority />
+              <i className="graphic-orbit graphic-orbit-one" />
+              <i className="graphic-orbit graphic-orbit-two" />
+            </span>
+            <strong>ELIXPOO</strong><small>v2 central policy runtime</small>
+          </div>
           <div className="graphic-line line-two"><i /></div>
           <div className="graphic-node node-action"><ShieldCheck size={21} /><small>action</small></div>
           <div className="graphic-boundary">typed schema · allowlist · idempotency · safety</div>
@@ -90,13 +97,13 @@ export default function Home() {
 
       <section className="section shell" id="distribution">
         <div className="distribution-grid">
-          <div className="section-heading"><span>03 / DISTRIBUTION</span><h2>Thin in every repo.<br />Central by design.</h2><p>Participating repositories contain only event callers. Implementation, policy, model routing, and upgrades stay in this control repository under the rolling <code>v1</code> reference.</p><Link className="text-link" href="/docs#deployment">Deployment contract <ArrowRight size={15} /></Link></div>
+          <div className="section-heading"><span>03 / DISTRIBUTION</span><h2>Thin in every repo.<br />Central by design.</h2><p>Participating repositories contain only event callers. Implementation, policy, model routing, and upgrades stay in this control repository under the rolling <code>v2</code> reference.</p><Link className="text-link" href="/docs#deployment">Deployment contract <ArrowRight size={15} /></Link></div>
           <div className="distribution-map">
             <div className="satellite"><PanelsTopLeft /><span><strong>Repository A</strong><small>four caller workflows</small></span></div>
             <div className="satellite"><PanelsTopLeft /><span><strong>Repository B</strong><small>four caller workflows</small></span></div>
             <div className="satellite"><PanelsTopLeft /><span><strong>Repository N</strong><small>four caller workflows</small></span></div>
             <div className="map-spine"><i /><i /><i /></div>
-            <div className="runtime-box"><Workflow /><span><small>PINNED RUNTIME</small><strong>elixpo/agent.elixpo@v1</strong></span></div>
+            <div className="runtime-box"><Workflow /><span><small>PINNED RUNTIME</small><strong>elixpo/agent.elixpo@v2</strong></span></div>
           </div>
         </div>
       </section>
@@ -108,10 +115,10 @@ export default function Home() {
 
       <section className="cta shell">
         <div><span><Braces size={18} /> PUBLIC CONTRACT</span><h2>Inspect the boundary.<br />Adopt the callers.</h2></div>
-        <div><Link className="button button-primary" href="/docs"><BookOpen size={16} /> Open documentation</Link><a className="button button-secondary" href="https://github.com/elixpo/agent.elixpo/tree/v1/distribution/workflows" target="_blank" rel="noreferrer">Browse workflows <ArrowUpRight size={14} /></a></div>
+        <div><Link className="button button-primary" href="/docs"><BookOpen size={16} /> Open documentation</Link><a className="button button-secondary" href="https://github.com/elixpo/agent.elixpo/tree/v2/distribution/workflows" target="_blank" rel="noreferrer">Browse workflows <ArrowUpRight size={14} /></a></div>
       </section>
 
-      <footer className="site-footer shell"><span>Elixpoo v1 · Elixpo</span><span>Open source under MIT · <a href="https://github.com/elixpo/agent.elixpo">GitHub</a></span></footer>
+      <footer className="site-footer shell"><span>Elixpoo v2 · Elixpo</span><span>Open source under MIT · <a href="https://github.com/elixpo/agent.elixpo">GitHub</a></span></footer>
     </main>
   );
 }

@@ -1,4 +1,4 @@
-"""Bounded model operations for Elixpoo v1."""
+"""Bounded model operations for Elixpoo v2."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from rtk.models import FunctionDef, Message, ToolDef
 
-from agents.elixpoo_v1.core import MetadataAction, PullReview, sanitize_evidence
+from agents.elixpoo_v2.core import MetadataAction, PullReview, sanitize_evidence
 
 
 class Classification(BaseModel):

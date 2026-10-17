@@ -11,7 +11,7 @@ CODING_REQUEST = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 CODING_REFUSAL_TEXT = (
-    "Elixpoo v1 does not implement product code, create solution branches, or open solving pull requests. "
+    "Elixpoo v2 does not implement product code, create solution branches, or open solving pull requests. "
     "I can improve this issue, identify missing evidence or likely owners, and outline a bounded plan for a human "
     "contributor."
 )

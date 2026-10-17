@@ -1,4 +1,4 @@
-name: Elixpoo v1 reusable merge memory
+name: Elixpoo v2 reusable merge memory
 
 on:
   workflow_call:
@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: elixpo/agent.elixpo
-          ref: ${{ vars.ELIXPOO_RUNTIME_REF || 'v1' }}
+          ref: ${{ vars.ELIXPOO_RUNTIME_REF || 'v2' }}
           persist-credentials: false
       - uses: actions/setup-python@v5
         with:
@@ -37,4 +37,4 @@ jobs:
           ELIXPOO_GIST_AGENTIC_TOKEN: ${{ secrets.gist_token }}
           ELIXPOO_FOLLOWUP_GIST_ID: ${{ secrets.gist_id }}
           ELIXPO_POLLINATIONS_API_KEY: ${{ secrets.pollinations_key }}
-        run: python -m agents.elixpoo_v1 merge-memory
+        run: python -m agents.elixpoo_v2 merge-memory

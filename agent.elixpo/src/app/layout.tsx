@@ -24,6 +24,7 @@ export const metadata: Metadata = {
   referrer: "origin-when-cross-origin",
   keywords: [
     "Elixpoo",
+    "Elixpoo v2",
     "GitHub project management agent",
     "GitHub Project V2 automation",
     "pull request review automation",
@@ -60,9 +61,12 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: [{ url: "/logo.png", type: "image/png", sizes: "1024x1024" }],
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: [{ url: "/apple-icon.png", type: "image/png", sizes: "180x180" }],
   },
 };
 
@@ -82,6 +86,7 @@ const structuredData = {
       "@id": `${SITE_URL}/#website`,
       url: SITE_URL,
       name: SITE_NAME,
+      softwareVersion: "2.0.0",
       description: SITE_DESCRIPTION,
       inLanguage: "en-US",
       publisher: { "@id": `${SITE_URL}/#organization` },

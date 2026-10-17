@@ -1,1 +1,1 @@
-"""Publish thin Elixpoo v1 caller pull requests."""
+"""Publish thin Elixpoo v2 caller pull requests."""

@@ -1,11 +1,11 @@
-# Elixpoo v1 repository callers
+# Elixpoo v2 repository callers
 
 Copy the four files in `distribution/workflows/` to a participating repository's
 `.github/workflows/` directory. They contain triggers and least-privilege job
 permissions only; all Python runtime code remains centralized here.
 
-The callers pin reusable workflows to the protected `v1` release ref. Release a
-tested runtime, move the protected `v1` tag to that release according to the
+The callers pin reusable workflows to the protected `v2` release ref. Release a
+tested runtime, move the protected `v2` tag to that release according to the
 maintainer release procedure, and run the rollout audit before merging caller
 updates. Repositories may instead pin an immutable commit SHA for stricter
 change control.
@@ -36,7 +36,7 @@ python -m agents.rollout_prs --repo lixrl.com --apply
 ```
 
 Dry-run is the default. `--apply` creates an idempotent branch and pull request
-through the GitHub API. The `Elixpoo v1 rollout PRs` workflow exposes the same
+through the GitHub API. The `Elixpoo v2 rollout PRs` workflow exposes the same
 operation through `workflow_dispatch`; it never merges the target pull request.
 Set `ELIXPOO_GITHUB_ROLLOUT_TOKEN` only in the control repository. Use a GitHub
 App installation token or fine-grained token covering the target repositories

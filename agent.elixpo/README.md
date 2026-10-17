@@ -1,6 +1,6 @@
 # Elixpoo public site
 
-The static public contract for Elixpoo v1. It intentionally exposes only two canonical routes:
+The static public contract for Elixpoo v2. It intentionally exposes only two canonical routes:
 
 - `/` — directive, capability boundary, protocol, and distribution model;
 - `/docs` — technical contract, authorization, trust model, and rollout instructions.

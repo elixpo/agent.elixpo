@@ -1,4 +1,4 @@
-name: Elixpoo v1 reusable pull request review
+name: Elixpoo v2 reusable pull request review
 
 on:
   workflow_call:
@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: elixpo/agent.elixpo
-          ref: ${{ vars.ELIXPOO_RUNTIME_REF || 'v1' }}
+          ref: ${{ vars.ELIXPOO_RUNTIME_REF || 'v2' }}
           persist-credentials: false
       - uses: actions/setup-python@v5
         with:
@@ -31,4 +31,4 @@ jobs:
         env:
           ELIXPOO_GITHUB_AGENTIC_TOKEN: ${{ secrets.github_token }}
           ELIXPO_POLLINATIONS_API_KEY: ${{ secrets.pollinations_key }}
-        run: python -m agents.elixpoo_v1 review
+        run: python -m agents.elixpoo_v2 review

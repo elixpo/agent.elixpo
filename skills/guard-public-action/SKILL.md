@@ -18,7 +18,7 @@ allowlists, event/revision key, existing markers, and final rendered public text
 ## Allowed actions
 
 Approve an exact typed operation, force it to preview, or reject it. Run the
-safety route for model-authored public text and append the v1 disclosure.
+safety route for model-authored public text and append the v2 disclosure.
 
 ## Output contract
 

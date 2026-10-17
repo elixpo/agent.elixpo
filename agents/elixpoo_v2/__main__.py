@@ -1,4 +1,4 @@
-"""Central Elixpoo v1 runtime for triage, mentions, reviews, and merge memory."""
+"""Central Elixpoo v2 runtime for triage, mentions, reviews, and merge memory."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from typing import Any
 import structlog
 import yaml
 
-from agents.elixpoo_v1.core import (
+from agents.elixpoo_v2.core import (
     MetadataAction,
     authorize_action,
     coding_refusal,
@@ -27,9 +27,9 @@ from agents.elixpoo_v1.core import (
     route_comment,
     validate_allowlists,
 )
-from agents.elixpoo_v1.memory import MergeRecord, remember_merge
-from agents.elixpoo_v1.model import classify, plan_response, review_pull, safety_check, summarize_merge
-from agents.elixpoo_v1.project import ProjectRecords
+from agents.elixpoo_v2.memory import MergeRecord, remember_merge
+from agents.elixpoo_v2.model import classify, plan_response, review_pull, safety_check, summarize_merge
+from agents.elixpoo_v2.project import ProjectRecords
 
 log = structlog.get_logger()
 
@@ -47,9 +47,9 @@ def _repository(event: dict) -> str:
 
 
 def _config(root: Path) -> dict:
-    data = yaml.safe_load((root / "config/elixpoo_v1.yaml").read_text()) or {}
-    if data.get("schema_version") != 1:
-        raise ValueError("unsupported Elixpoo v1 configuration")
+    data = yaml.safe_load((root / "config/elixpoo_v2.yaml").read_text()) or {}
+    if data.get("schema_version") != 2:
+        raise ValueError("unsupported Elixpoo v2 configuration")
     return data
 
 
@@ -63,7 +63,7 @@ async def _ensure_and_apply_labels(
     api, owner: str, repo: str, number: int, subject: dict, wanted: set[str], config: dict
 ):
     specs = {
-        name: ("d4c5f9", "Managed by the central Elixpoo v1 label taxonomy")
+        name: ("d4c5f9", "Managed by the central Elixpoo v2 label taxonomy")
         for values in config["labels"].values()
         for name in values
     }
@@ -401,12 +401,12 @@ async def _run(mode: str) -> int:
     config = _config(settings.root)
     token = settings.github.token
     if not token or not settings.pollinations.api_key:
-        log.error("elixpoo_v1.missing_credentials", mode=mode)
+        log.error("elixpoo_v2.missing_credentials", mode=mode)
         return 1
     api = GitHubAPI.from_token(token)
     project_api = None
     gist_api = None
-    router = Router.from_settings(f"elixpoo-v1-{mode}", budget=Budget(mode, limit=20_000, kill_multiple=1.25))
+    router = Router.from_settings(f"elixpoo-v2-{mode}", budget=Budget(mode, limit=20_000, kill_multiple=1.25))
     try:
         project = None
         if mode in {"triage", "mention"}:
@@ -432,7 +432,7 @@ async def _run(mode: str) -> int:
             gist_api = GitHubAPI.from_token(settings.followups.gist_token)
             result = await merge_memory_one(api, gist_api, router, event, settings.followups.gist_id)
     except Exception as exc:
-        log.error("elixpoo_v1.failed", mode=mode, error=str(exc), spent=router.budget.spent)
+        log.error("elixpoo_v2.failed", mode=mode, error=str(exc), spent=router.budget.spent)
         return 1
     finally:
         await api.close()
@@ -446,7 +446,7 @@ async def _run(mode: str) -> int:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run one Elixpoo v1 project-management operation")
+    parser = argparse.ArgumentParser(description="Run one Elixpoo v2 project-management operation")
     parser.add_argument("mode", choices=("triage", "mention", "review", "merge-memory"))
     args = parser.parse_args()
     raise SystemExit(asyncio.run(_run(args.mode)))

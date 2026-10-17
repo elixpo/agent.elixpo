@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.0.0 — 2026-10-17
+
+- Publish the v2 central policy runtime, schemas, reusable workflows, and thin callers.
+- Move public operation markers and rollout references to the protected `v2` release.
+- Refresh the public site, technical contract, application icons, and social preview around the Elixpoo brand.
+- Preserve the v1 release and the pre-v1 autonomous-contributor archive as immutable history.
+
 ## v1 — Project-management runtime
 
 - Replace the autonomous code-contribution pipeline with bounded triage,

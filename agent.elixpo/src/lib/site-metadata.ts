@@ -2,16 +2,16 @@ import type { Metadata } from "next";
 
 export const SITE_URL = "https://agent.elixpo.com";
 export const SITE_NAME = "Elixpoo";
-export const SITE_TITLE = "Elixpoo — GitHub Project Management Agent";
+export const SITE_TITLE = "Elixpoo v2 — GitHub Project Management Agent";
 export const SITE_DESCRIPTION =
-  "Elixpoo is Elixpo's open-source GitHub project-management agent for bounded triage, exact mentions, pull-request review, Project V2 synchronization, Discussions, and merge memory.";
+  "Elixpoo v2 is Elixpo's open-source GitHub project-management agent for bounded triage, exact mentions, pull-request review, Project V2 synchronization, Discussions, and merge memory.";
 
 export const SOCIAL_IMAGE = {
   url: "/default.png",
   width: 1280,
   height: 720,
   type: "image/png",
-  alt: "Elixpoo — bounded GitHub project management across Elixpo repositories",
+  alt: "Elixpoo v2 — bounded GitHub project management across Elixpo repositories",
 };
 
 export function absoluteUrl(path = "/") {

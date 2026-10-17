@@ -36,7 +36,7 @@ async def _run(repo: str, concurrency: int, apply: bool) -> int:
             router = Router.from_settings("rollout-prs", budget=Budget("rollout-prs", limit=2_000))
             await safety_check(
                 router,
-                "[CHORE] Install Elixpoo v1 project workflows. Installs thin event callers for the centralized "
+                "[CHORE] Install Elixpoo v2 project workflows. Installs thin event callers for the centralized "
                 "project-management runtime; no implementation or product-code automation is copied.",
             )
             semaphore = asyncio.Semaphore(max(1, min(concurrency, 3)))
@@ -81,7 +81,7 @@ async def _run(repo: str, concurrency: int, apply: bool) -> int:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Open reviewable Elixpoo v1 caller PRs")
+    parser = argparse.ArgumentParser(description="Open reviewable Elixpoo v2 caller PRs")
     parser.add_argument("--repo", default="", help="Limit rollout to one repository name or owner/name")
     parser.add_argument("--concurrency", type=int, default=5)
     parser.add_argument("--apply", action="store_true", help="Create branches and pull requests")

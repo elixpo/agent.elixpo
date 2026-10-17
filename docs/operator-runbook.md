@@ -1,4 +1,4 @@
-# Elixpoo v1 operator runbook
+# Elixpoo v2 operator runbook
 
 ## Routine checks
 
@@ -14,8 +14,8 @@
 - Revoke the narrow token involved, then rotate it only in repositories that use that capability.
 - Preserve event IDs, workflow URLs, public markers, Project item IDs, and Gist revisions for diagnosis.
 - Never bypass a Gist revision conflict. Re-read, reconcile, and write from a fresh snapshot.
-- A coding request reaching any legacy workflow is a release blocker. Disable that workflow and run the v1 workflow tests before restoring service.
+- A coding request reaching any legacy workflow is a release blocker. Disable that workflow and run the v2 workflow tests before restoring service.
 
 ## Release
 
-Run focused Python tests and workflow validation, review the rollout manifest, publish an immutable release, then move the protected `v1` ref according to maintainer policy. The rollout audit identifies repositories still pinned to an older or malformed caller.
+Run focused Python tests and workflow validation, review the rollout manifest, publish an immutable release, then move the protected `v2` ref according to maintainer policy. The rollout audit identifies repositories still pinned to an older or malformed caller.

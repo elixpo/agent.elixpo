@@ -23,7 +23,7 @@ def test_callers_are_pinned_minimal_and_never_use_pull_request_target() -> None:
     for name in CALLERS:
         text = (ROOT / "distribution/workflows" / name).read_text()
         assert "uses: elixpo/agent.elixpo/.github/workflows/" in text
-        assert "@v1" in text
+        assert "@v2" in text
         assert "permissions: {}" in text
         assert "pull_request_target" not in text
         assert "actions/checkout" not in text
