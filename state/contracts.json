@@ -13,26 +13,26 @@
       "status": ""
     },
     "candidates.json": {
-      "expires_at": "2026-08-13T07:25:26.163859+00:00",
+      "expires_at": "2026-09-05T10:47:04.124434+00:00",
       "key": "",
-      "payload_sha256": "0791dc1536c80a5c614c693ee65d40feeacc36e798a8a2170d3c1454fb7c1e3c",
-      "produced_at": "2026-08-12T07:25:26.163859+00:00",
+      "payload_sha256": "15923d1db7418a53fef0e3b1aaf7cbf9adae23eee67f39fcc91a4bdf982e1689",
+      "produced_at": "2026-09-04T10:47:04.124434+00:00",
       "producer": "scout",
       "run_id": "",
       "schema_version": 1,
-      "sequence": 4,
+      "sequence": 27,
       "state_file": "candidates.json",
       "status": ""
     },
     "daily_summary.json": {
-      "expires_at": "2026-08-20T02:44:20.274791+00:00",
+      "expires_at": "2026-09-12T04:33:33.928353+00:00",
       "key": "",
-      "payload_sha256": "2cca1f030ca977c317c178cd292d9ab25880c89d015953fba79c87db45e03f30",
-      "produced_at": "2026-08-12T02:44:20.274791+00:00",
+      "payload_sha256": "a7261ae4d6976d801f4501c1f1c802fec16a507fb9e46fd0b31ec59562af7822",
+      "produced_at": "2026-09-04T04:33:33.928353+00:00",
       "producer": "daily-summary",
       "run_id": "",
       "schema_version": 1,
-      "sequence": 3,
+      "sequence": 26,
       "state_file": "daily_summary.json",
       "status": "degraded"
     },
@@ -170,5 +170,5 @@
     }
   },
   "schema_version": 1,
-  "updated_at": "2026-08-12T07:25:26.163859+00:00"
+  "updated_at": "2026-09-04T10:47:04.124434+00:00"
 }
