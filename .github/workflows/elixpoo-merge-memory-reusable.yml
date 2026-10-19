@@ -3,7 +3,7 @@ name: Elixpoo v2 reusable merge memory
 on:
   workflow_call:
     secrets:
-      github_token:
+      agentic_token:
         required: true
       gist_token:
         required: true
@@ -33,7 +33,7 @@ jobs:
       - run: pip install -e .
       - name: Write one revision-checked merge record
         env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
+          GITHUB_TOKEN: ${{ secrets.agentic_token }}
           ELIXPOO_GIST_AGENTIC_TOKEN: ${{ secrets.gist_token }}
           ELIXPOO_FOLLOWUP_GIST_ID: ${{ secrets.gist_id }}
           ELIXPO_POLLINATIONS_API_KEY: ${{ secrets.pollinations_key }}
