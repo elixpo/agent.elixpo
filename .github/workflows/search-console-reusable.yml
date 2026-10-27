@@ -24,10 +24,10 @@ on:
         type: string
         default: ""
       inspect-limit:
-        description: Maximum URLs to inspect per run (shared ~2,000/day quota per property); 0 submits the sitemap only
+        description: Maximum URLs to inspect per run, newest lastmod first (shared ~2,000/day quota per property); 0 submits the sitemap only
         required: false
         type: number
-        default: 100
+        default: 50
     secrets:
       google_service_account_json:
         description: Full Google service-account key JSON; the run is skipped when absent

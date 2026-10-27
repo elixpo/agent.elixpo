@@ -12,7 +12,8 @@
 //   SEARCH_CONSOLE_SITE          property id, e.g. "sc-domain:elixpo.com".
 //                                Defaults to the URL-prefix property "<SITE_URL>/".
 //   SITEMAP_URL                  defaults to "<SITE_URL>/sitemap.xml"
-//   INSPECT_LIMIT                maximum URLs to inspect per run (default 100).
+//   INSPECT_LIMIT                maximum URLs to inspect per run (default 50),
+//                                most recently modified first.
 //                                URL Inspection allows ~2,000 calls/day per
 //                                property, shared by every site on that property.
 import crypto from "node:crypto";
@@ -21,7 +22,7 @@ import fs from "node:fs";
 const SITE_URL = (process.env.SITE_URL || "").replace(/\/+$/, "");
 const PROPERTY = process.env.SEARCH_CONSOLE_SITE || `${SITE_URL}/`;
 const SITEMAP_URL = process.env.SITEMAP_URL || `${SITE_URL}/sitemap.xml`;
-const INSPECT_LIMIT = Number.parseInt(process.env.INSPECT_LIMIT || "100", 10);
+const INSPECT_LIMIT = Number.parseInt(process.env.INSPECT_LIMIT || "50", 10);
 const SCOPE = "https://www.googleapis.com/auth/webmasters";
 const submitOnly = process.argv.includes("--submit");
 
@@ -75,10 +76,18 @@ async function submitSitemap(token) {
   summary(`### Sitemap\n\nSubmitted \`${SITEMAP_URL}\` to \`${PROPERTY}\`: ${submitted} URLs, last downloaded by Google ${status.lastDownloaded || "never"}, ${status.errors || 0} errors, ${status.warnings || 0} warnings.\n`);
 }
 
+// Most recently modified first, so a capped run always covers new pages.
 async function getSitemapUrls() {
   const res = await fetch(SITEMAP_URL);
   if (!res.ok) throw new Error(`Fetching ${SITEMAP_URL} failed: ${res.status}`);
-  return [...(await res.text()).matchAll(/<loc>(.*?)<\/loc>/g)].map((m) => m[1].trim());
+  const entries = [...(await res.text()).matchAll(/<url>([\s\S]*?)<\/url>/g)].map(([, block]) => ({
+    url: block.match(/<loc>(.*?)<\/loc>/)?.[1].trim(),
+    lastmod: Date.parse(block.match(/<lastmod>(.*?)<\/lastmod>/)?.[1] ?? "") || 0,
+  }));
+  return entries
+    .filter((entry) => entry.url)
+    .sort((a, b) => b.lastmod - a.lastmod)
+    .map((entry) => entry.url);
 }
 
 async function inspectUrls(token) {

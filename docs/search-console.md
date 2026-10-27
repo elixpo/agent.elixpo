@@ -21,9 +21,17 @@ Without the secret the run logs a skip message and exits successfully.
 
 ## Adding a site
 
-Copy `distribution/workflows/search-console.yml` into the site repository's
-`.github/workflows/`, set `site-url`, and give the cron a minute no other site
-uses. Pass `property` only when the site is not on `SEARCH_CONSOLE_SITE`.
+Copy a caller into the site repository's `.github/workflows/`, set `site-url`
+and the deploy workflow name, and give the cron a minute no other site uses.
+Pass `property` only when the site is not on `SEARCH_CONSOLE_SITE`.
+
+| Caller | Sites | Runs | Inspected per run |
+|---|---|---|---|
+| `distribution/workflows/search-console.yml` | every site except LixBlogs | after each successful deploy of a merge, and every third day | 50 |
+| `distribution/workflows/search-console-blogs.yml` | LixBlogs | every 6 hours (posts publish without merges) | 100 |
+
+Every run resubmits the full sitemap; only URL inspection is capped, and it
+takes the most recently modified URLs first.
 
 ## Inputs
 
@@ -32,13 +40,21 @@ uses. Pass `property` only when the site is not on `SEARCH_CONSOLE_SITE`.
 | `site-url` | required | Public origin, e.g. `https://me.elixpo.com` |
 | `property` | `vars.SEARCH_CONSOLE_SITE`, then `<site-url>/` | Search Console property id |
 | `sitemap-url` | `<site-url>/sitemap.xml` | Sitemap location |
-| `inspect-limit` | `100` | URLs inspected per run; `0` submits the sitemap only |
+| `inspect-limit` | `50` | URLs inspected per run, newest `lastmod` first; `0` submits the sitemap only |
 
 ## Quota
 
 URL Inspection allows about 2,000 calls per day per property, and every site on
-`sc-domain:elixpo.com` shares that budget. Keep each site's `inspect-limit`
-times its runs per day well under it. Sitemap submission does not consume the
-inspection quota.
+`sc-domain:elixpo.com` shares that budget. Sitemap submission does not consume
+it. The standard cadence spends roughly:
+
+| Source | Per day |
+|---|---|
+| LixBlogs: 4 runs × 100 | 400 |
+| ~15 other sites: one run every 3 days × 50 | 250 |
+| Deploys: 50 per merge | 50 × merges |
+
+That leaves room for about 20 merges a day across the organization. Lower a
+site's `inspect-limit` before adding a faster schedule.
 
 `vars.ELIXPO_SEARCH_CONSOLE_REF` pins the script revision; it defaults to `main`.
