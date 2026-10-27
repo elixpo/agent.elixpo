@@ -1,0 +1,24 @@
+name: Search Console Sync
+on:
+  schedule:
+    # Pick a different minute per repo so sites on the same property do not
+    # run together.
+    - cron: "17 3 * * *"
+  workflow_run:
+    workflows: [Production Deploy]
+    types: [completed]
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: search-console-${{ github.repository }}
+  cancel-in-progress: true
+jobs:
+  sync:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    permissions:
+      contents: read
+    uses: elixpo/agent.elixpo/.github/workflows/search-console-reusable.yml@main
+    with:
+      site-url: https://example.elixpo.com # replace with this repo's site
+    secrets:
+      google_service_account_json: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
