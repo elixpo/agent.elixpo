@@ -12,8 +12,15 @@ the shapes it needs:
 | `publish-vscode.yml` | VS Code extensions; publishes only new versions |
 
 Pages and Worker deploys can also decrypt a sops-encrypted `.env` (`sops-file`), sync chosen
-keys from it as runtime secrets (`secret-keys`), and apply D1 migrations (`d1-database`).
-`CLOUDFLARE_*` keys are never synced as runtime secrets.
+keys from it as runtime secrets, and apply D1 migrations (`d1-database`). Secret selection:
+
+- `secret-keys`: names or globs to sync (`all` or `*` for every key);
+- `secret-exclude`: names or globs to leave out (an exact name in `secret-keys` still wins);
+- `secret-map`: `TARGET=SOURCE` lines to sync a key under another name;
+- `secret-values`: `KEY=value` lines for non-secret constants such as a production URL.
+
+`CLOUDFLARE_*` keys are never synced as runtime secrets. Directories without a `package.json`
+(plain Workers) skip the npm install and run wrangler through npx.
 
 ## Credentials
 
