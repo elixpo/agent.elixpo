@@ -31,6 +31,10 @@ services:
   - mail.elixpo.com
   - me.elixpo.com
 
+# Hosts that get a theme's next design (its `canary` override in the engine) before every
+# service does. Empty while no design is in trial; preview one anywhere with ?festive-canary=1.
+canary: []
+
 festivals:
   - id: new-year
     name: New Year

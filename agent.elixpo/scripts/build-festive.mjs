@@ -20,6 +20,7 @@ if (calendar?.version !== 1) fail("version must be 1");
 try { new Intl.DateTimeFormat("en-CA", { timeZone: calendar.timezone }); } catch { fail(`unknown timezone: ${calendar?.timezone}`); }
 if (!Number.isInteger(calendar?.defaults?.before) || !Number.isInteger(calendar?.defaults?.after)) fail("defaults.before and defaults.after must be integers");
 if (!Array.isArray(calendar?.services) || calendar.services.length === 0) fail("services must list at least one host");
+if (calendar?.canary != null && (!Array.isArray(calendar.canary) || calendar.canary.some((host) => !calendar.services?.includes(host)))) fail("canary must list hosts that are also in services");
 if (calendar?.override != null && calendar.override !== "none" && !THEMES.includes(calendar.override)) fail(`override must be null, "none", or one of: ${THEMES.join(", ")}`);
 
 const ids = new Set();
@@ -51,7 +52,7 @@ if (problems.length) {
   process.exit(1);
 }
 
-const payload = { timezone: calendar.timezone, defaults: calendar.defaults, override: calendar.override ?? null, services: calendar.services, festivals, seasons };
+const payload = { timezone: calendar.timezone, defaults: calendar.defaults, override: calendar.override ?? null, services: calendar.services, canary: calendar.canary ?? [], festivals, seasons };
 const out = join(site, "public", "festive", "theme.js");
 mkdirSync(dirname(out), { recursive: true });
 writeFileSync(out, engine.replace("/*__ELIXPO_FESTIVE_CALENDAR__*/ null", JSON.stringify(payload)));
