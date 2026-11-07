@@ -33,8 +33,7 @@ services:
 
 # Hosts that get a theme's next design (its `canary` override in the engine) before every
 # service does. Empty while no design is in trial; preview one anywhere with ?festive-canary=1.
-canary:
-  - elixpo.com
+canary: []
 
 # Routes that never show a theme, per host: work surfaces such as canvases and editors.
 # Globs; * matches anything, including "/".
