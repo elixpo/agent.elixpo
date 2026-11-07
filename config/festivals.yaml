@@ -33,7 +33,8 @@ services:
 
 # Hosts that get a theme's next design (its `canary` override in the engine) before every
 # service does. Empty while no design is in trial; preview one anywhere with ?festive-canary=1.
-canary: []
+canary:
+  - elixpo.com
 
 festivals:
   - id: new-year

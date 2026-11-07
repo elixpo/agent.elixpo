@@ -12,7 +12,10 @@
   var THEMES = {
     // A theme may carry a `canary` override: the next design, served first to hosts listed under
     // `canary` in festivals.yaml (and on localhost) before it replaces the default.
-    "diwali": { accent: "#f59e0b", colors: ["#ffb347", "#ff7a1a", "#ffd166", "#e85d04"], particle: null, garland: "toran", diyas: true, trail: true },
+    "diwali": { accent: "#f59e0b", colors: ["#ffb347", "#ff7a1a", "#ffd166", "#e85d04"], particle: null, garland: "toran", diyas: true, trail: true,
+      // Next design (canary hosts only): the top bar moves below the toran, hanging diyas stay
+      // inside that band, and the festival colours wash faintly over the whole page.
+      canary: { topOffset: 58, hangLen: [4, 10], tint: true } },
     "holi": { accent: "#ec4899", colors: ["#ff4d9d", "#4dabff", "#ffd23f", "#3ddc84", "#a259ff"], particle: "powder", garland: "bunting" },
     "independence-day": { accent: "#ff9933", colors: ["#ff9933", "#ffffff", "#138808", "#000080"], particle: "confetti", garland: "bunting" },
     "republic-day": { accent: "#138808", colors: ["#ff9933", "#ffffff", "#138808", "#000080"], particle: "confetti", garland: "bunting" },
@@ -111,6 +114,8 @@
     "#elixpo-festive .ef-hang{position:absolute;top:14px;left:var(--x);width:30px;height:var(--len);transform-origin:50% 0;animation:ef-sway var(--d) ease-in-out var(--delay) infinite alternate;transition:opacity .35s}",
     "#elixpo-festive .ef-hang::before{content:'';position:absolute;left:50%;top:0;width:1px;height:100%;background:linear-gradient(#9c5518,#e8a33d)}",
     "#elixpo-festive .ef-hang .ef-diya{left:0;top:calc(100% + 13px)}",
+    "#elixpo-festive-tint{position:fixed;inset:0;z-index:9989;pointer-events:none;contain:strict;background:radial-gradient(ellipse 55% 45% at 0 0,var(--ef-t0),transparent 70%),radial-gradient(ellipse 55% 45% at 100% 0,var(--ef-t1),transparent 70%),radial-gradient(ellipse 60% 50% at 0 100%,var(--ef-t2),transparent 70%),radial-gradient(ellipse 60% 50% at 100% 100%,var(--ef-t0),transparent 70%),linear-gradient(var(--ef-t3),var(--ef-t3))}",
+    "html[data-elixpo-festive-offset] body{padding-top:calc(var(--ef-body-pad,0px) + var(--ef-top-offset))}",
     "#elixpo-festive-bg{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;contain:strict;background:radial-gradient(ellipse 90% 55% at 50% 115%,rgba(255,160,50,.11),transparent 70%)}",
     "#elixpo-festive-bg .ef-diya{opacity:var(--o);transform:scale(var(--k));transform-origin:50% 100%;--glow:110px}",
     "#elixpo-festive-bg .ef-diya::after{background:radial-gradient(circle,rgba(255,176,64,.55),transparent 62%)}",
@@ -122,7 +127,7 @@
     "@keyframes ef-pool{from{opacity:.65;transform:scale(.92)}to{opacity:1;transform:scale(1.06)}}",
     "@keyframes ef-sway{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}",
     "@media (prefers-reduced-motion:reduce){#elixpo-festive .ef-p,#elixpo-festive .ef-spark{display:none}#elixpo-festive .ef-garland::after,.ef-flame,#elixpo-festive .ef-hang,.ef-diya::after,.ef-badge{animation:none}}",
-    "@media print{#elixpo-festive,#elixpo-festive-bg,.ef-badge{display:none}}"
+    "@media print{#elixpo-festive,#elixpo-festive-bg,#elixpo-festive-tint,.ef-badge{display:none}}"
   ].join("");
 
   var PARTICLES = {
@@ -169,14 +174,14 @@
     return d;
   }
 
-  function mountDiyas(layer) {
+  function mountDiyas(layer, hangLen) {
     var hang = [];
     var hangCount = Math.max(4, Math.min(14, Math.round(innerWidth / 130)));
     for (var i = 0; i < hangCount; i++) {
       var h = document.createElement("span");
       h.className = "ef-hang";
       h.style.setProperty("--x", ((i + 0.5) / hangCount * 100 + rand(-2, 2)).toFixed(2) + "vw");
-      h.style.setProperty("--len", rand(10, 34).toFixed(0) + "px");
+      h.style.setProperty("--len", rand(hangLen[0], hangLen[1]).toFixed(0) + "px");
       h.style.setProperty("--d", rand(2.6, 4.2).toFixed(2) + "s");
       h.style.setProperty("--delay", (-rand(0, 4)).toFixed(2) + "s");
       h.appendChild(diya());
@@ -199,6 +204,8 @@
     return function () { removeEventListener("scroll", schedule); removeEventListener("resize", schedule); };
   }
 
+  var TOP_BAND = 160; // keep the navigation area clear of background diyas
+
   /** Faint diyas scattered behind the page; sections with their own background cover them. */
   function mountBackdrop() {
     var bg = document.createElement("div");
@@ -210,7 +217,7 @@
         if (Math.random() < 0.45) continue;
         var d = diya();
         d.style.left = ((c + rand(0.15, 0.85)) / cols * 100).toFixed(2) + "%";
-        d.style.top = ((r + rand(0.2, 0.85)) / rows * 100).toFixed(2) + "%";
+        d.style.top = (TOP_BAND + (r + rand(0.2, 0.85)) / rows * (innerHeight - TOP_BAND)).toFixed(0) + "px";
         d.style.setProperty("--o", rand(0.16, 0.3).toFixed(2));
         d.style.setProperty("--k", rand(0.8, 1.35).toFixed(2));
         bg.appendChild(d);
@@ -262,6 +269,48 @@
     };
   }
 
+  /** A faint wash of the festival colours from every edge of the page. */
+  function mountTint(colors) {
+    var root = document.documentElement;
+    [0.13, 0.11, 0.1].forEach(function (a, i) { root.style.setProperty("--ef-t" + i, hexAlpha(colors[i % colors.length], a)); });
+    root.style.setProperty("--ef-t3", hexAlpha(colors[0], 0.035));
+    var tint = document.createElement("div");
+    tint.id = "elixpo-festive-tint";
+    tint.setAttribute("aria-hidden", "true");
+    document.body.appendChild(tint);
+    return function () { tint.remove(); };
+  }
+
+  /**
+   * Moves the site's top bar below the toran and pushes the page down by the same amount.
+   * Fixed bars are translated; sticky bars get a larger `top`. Re-applied on resize and DOM changes.
+   */
+  function mountTopOffset(px) {
+    var root = document.documentElement;
+    root.style.setProperty("--ef-body-pad", getComputedStyle(document.body).paddingTop);
+    root.style.setProperty("--ef-top-offset", px + "px");
+    root.setAttribute("data-elixpo-festive-offset", "");
+    var shift = function () {
+      var els = document.body.getElementsByTagName("*");
+      for (var i = 0; i < els.length; i++) {
+        var el = els[i];
+        if (el.hasAttribute("data-ef-shifted") || el.closest("#elixpo-festive,#elixpo-festive-bg,#elixpo-festive-tint,.ef-badge")) continue;
+        var style = getComputedStyle(el);
+        if (style.position !== "fixed" && style.position !== "sticky") continue;
+        var b = el.getBoundingClientRect();
+        if (b.top > 48 || b.height > 180 || b.width < innerWidth * 0.4) continue;
+        el.setAttribute("data-ef-shifted", "");
+        if (style.position === "fixed") el.style.translate = "0 " + px + "px";
+        else el.style.top = "calc(" + style.top + " + " + px + "px)";
+      }
+    };
+    shift();
+    var timer = 0;
+    var observer = new MutationObserver(function () { clearTimeout(timer); timer = setTimeout(shift, 200); });
+    observer.observe(document.body, { childList: true, subtree: true });
+    return function () { observer.disconnect(); };
+  }
+
   function mount(active) {
     var base = THEMES[active.id], theme = {};
     for (var k in base) theme[k] = base[k];
@@ -285,8 +334,10 @@
     layer.setAttribute("aria-hidden", "true");
     layer.innerHTML = '<div class="ef-glow"></div>' + (theme.garland ? '<div class="ef-garland ' + theme.garland + '"></div>' : "");
     var cleanups = [];
+    if (theme.topOffset) mountTopOffset(theme.topOffset);
+    if (theme.tint) mountTint(theme.colors);
     if (theme.diyas) {
-      cleanups.push(mountDiyas(layer));
+      cleanups.push(mountDiyas(layer, theme.hangLen || [10, 34]));
       if (!dismissed) cleanups.push(mountBackdrop());
     }
     if (!dismissed && theme.trail) cleanups.push(mountTrail(layer, theme.colors));
