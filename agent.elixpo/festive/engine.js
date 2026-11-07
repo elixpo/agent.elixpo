@@ -10,7 +10,9 @@
   if (!CALENDAR || window.ElixpoFestive) return;
 
   var THEMES = {
-    "diwali": { accent: "#f59e0b", colors: ["#ffb347", "#ff7a1a", "#ffd166", "#e85d04"], particle: "ember", garland: "lights" },
+    // `canary` is the next design, served first to hosts listed under `canary` in festivals.yaml.
+    "diwali": { accent: "#f59e0b", colors: ["#ffb347", "#ff7a1a", "#ffd166", "#e85d04"], particle: "ember", garland: "lights",
+      canary: { particle: null, garland: "toran", diyas: true, trail: true } },
     "holi": { accent: "#ec4899", colors: ["#ff4d9d", "#4dabff", "#ffd23f", "#3ddc84", "#a259ff"], particle: "powder", garland: "bunting" },
     "independence-day": { accent: "#ff9933", colors: ["#ff9933", "#ffffff", "#138808", "#000080"], particle: "confetti", garland: "bunting" },
     "republic-day": { accent: "#138808", colors: ["#ff9933", "#ffffff", "#138808", "#000080"], particle: "confetti", garland: "bunting" },
@@ -51,6 +53,11 @@
     return season ? { id: season.id, name: season.name, greeting: null, festival: false } : null;
   }
 
+  var host = location.hostname.replace(/^www\./, "");
+  var canaryPreview = false;
+  try { canaryPreview = new URLSearchParams(location.search).get("festive-canary") === "1"; } catch (e) { /* no URL API */ }
+  var isCanary = canaryPreview || (CALENDAR.canary || []).indexOf(host) !== -1;
+
   function pick() {
     var param = null;
     try { param = new URLSearchParams(location.search).get("festive"); } catch (e) { /* no URL API */ }
@@ -60,7 +67,6 @@
       var known = CALENDAR.festivals.concat(CALENDAR.seasons || []).filter(function (f) { return f.id === forced; })[0] || {};
       return { id: forced, name: known.name || forced, greeting: known.greeting || null, festival: !!known.greeting };
     }
-    var host = location.hostname.replace(/^www\./, "");
     var local = host === "localhost" || host === "127.0.0.1";
     if (!local && CALENDAR.services.indexOf(host) === -1) return null;
     return resolve(todayIso());
@@ -96,7 +102,22 @@
     ".ef-badge button:hover{background:var(--ef-accent)}",
     "@keyframes ef-in{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}",
     "html[data-elixpo-festive] ::selection{background:var(--ef-accent-soft-strong)}",
-    "@media (prefers-reduced-motion:reduce){#elixpo-festive .ef-p{display:none}#elixpo-festive .ef-garland::after,.ef-badge{animation:none}}",
+    "#elixpo-festive .ef-garland.toran{height:22px;background:radial-gradient(ellipse 4px 7px at 8px 17px,#2d6a4f 0 98%,transparent 100%) 4px 0/48px 26px,radial-gradient(circle at 8px 9px,#ff9f1c 0 6px,transparent 6.5px) 0 0/16px 22px,radial-gradient(circle at 8px 9px,#ffd166 0 6px,transparent 6.5px) 8px 4px/16px 22px;filter:drop-shadow(0 2px 2px rgba(120,40,0,.25))}",
+    "#elixpo-festive .ef-diya{position:absolute;width:30px;height:14px;transition:opacity .35s}",
+    "#elixpo-festive .ef-diya::before{content:'';position:absolute;inset:0;border-radius:0 0 50% 50%/0 0 100% 100%;background:linear-gradient(180deg,#f48c06,#9d0208);box-shadow:inset 0 2px 0 #ffba08}",
+    "#elixpo-festive .ef-diya::after{content:'';position:absolute;left:50%;bottom:4px;width:64px;height:64px;margin-left:-32px;border-radius:50%;background:radial-gradient(circle,rgba(255,186,80,.42),transparent 65%);animation:ef-pool 2.4s ease-in-out infinite alternate}",
+    "#elixpo-festive .ef-flame{position:absolute;left:50%;bottom:calc(100% - 3px);width:9px;height:15px;margin-left:-4.5px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:radial-gradient(ellipse at 50% 75%,#fffbe0 0 22%,#ffd166 42%,#ff8c1a 72%,rgba(255,120,0,0) 74%);transform-origin:50% 100%;animation:ef-flicker .19s ease-in-out var(--fd,0s) infinite alternate}",
+    "#elixpo-festive .ef-hang{position:absolute;top:14px;left:var(--x);width:30px;height:var(--len);transform-origin:50% 0;animation:ef-sway var(--d) ease-in-out var(--delay) infinite alternate;transition:opacity .35s}",
+    "#elixpo-festive .ef-hang::before{content:'';position:absolute;left:50%;top:0;width:1px;height:100%;background:linear-gradient(#9c5518,#e8a33d)}",
+    "#elixpo-festive .ef-hang .ef-diya{left:0;top:calc(100% + 13px)}",
+    "#elixpo-festive .ef-floor{transform:scale(1.25);transform-origin:50% 100%}",
+    "#elixpo-festive .ef-off{opacity:0}",
+    "#elixpo-festive .ef-spark{position:absolute;left:0;top:0;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;background:radial-gradient(circle,#fff6d5 0 25%,var(--c) 60%);clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);opacity:0;will-change:transform,opacity}",
+    "html.ef-cursor,html.ef-cursor body{cursor:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12 1l2.6 8.4L23 12l-8.4 2.6L12 23l-2.6-8.4L1 12l8.4-2.6z' fill='%23ffc94d' stroke='%23893101' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E\") 12 12,auto}",
+    "@keyframes ef-flicker{from{transform:scale(1,1) rotate(-2deg)}to{transform:scale(.9,1.13) rotate(2deg)}}",
+    "@keyframes ef-pool{from{opacity:.65;transform:scale(.92)}to{opacity:1;transform:scale(1.06)}}",
+    "@keyframes ef-sway{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}",
+    "@media (prefers-reduced-motion:reduce){#elixpo-festive .ef-p,#elixpo-festive .ef-spark{display:none}#elixpo-festive .ef-garland::after,#elixpo-festive .ef-flame,#elixpo-festive .ef-hang,#elixpo-festive .ef-diya::after,.ef-badge{animation:none}}",
     "@media print{#elixpo-festive,.ef-badge{display:none}}"
   ].join("");
 
@@ -113,8 +134,123 @@
   var hexAlpha = function (hex, a) { var n = parseInt(hex.slice(1), 16); return "rgba(" + (n >> 16) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")"; };
   var rand = function (min, max) { return min + Math.random() * (max - min); };
 
+  var MEDIA = { IMG: 1, SVG: 1, VIDEO: 1, CANVAS: 1, BUTTON: 1, INPUT: 1, TEXTAREA: 1, SELECT: 1, IFRAME: 1 };
+
+  /** True when nothing readable or interactive is under the rectangle (only page background). */
+  function isEmptyArea(x, y, w, h) {
+    var points = [[x + w / 2, y + h / 2], [x + 2, y + 2], [x + w - 2, y + 2], [x + 2, y + h - 2], [x + w - 2, y + h - 2]];
+    var viewArea = innerWidth * innerHeight;
+    for (var i = 0; i < points.length; i++) {
+      var px = points[i][0], py = points[i][1];
+      if (px < 0 || py < 0 || px > innerWidth || py > innerHeight) return false;
+      var el = document.elementFromPoint(px, py);
+      if (!el || el === document.documentElement || el === document.body) continue;
+      if (MEDIA[el.tagName.toUpperCase()] || el.closest("a,button,label,input,textarea,select,[role=button],nav,header")) return false;
+      for (var n = el.firstChild; n; n = n.nextSibling) if (n.nodeType === 3 && n.textContent.trim()) return false;
+      var box = el.getBoundingClientRect();
+      if (box.width * box.height > viewArea * 0.35) continue;
+      var bg = getComputedStyle(el).backgroundColor;
+      if (bg && bg !== "transparent" && !/,\s*0\)$/.test(bg)) return false;
+    }
+    return true;
+  }
+
+  function diya() {
+    var d = document.createElement("span");
+    d.className = "ef-diya";
+    var flame = document.createElement("i");
+    flame.className = "ef-flame";
+    flame.style.setProperty("--fd", (-rand(0, 0.4)).toFixed(2) + "s");
+    d.appendChild(flame);
+    return d;
+  }
+
+  function mountDiyas(layer, withFloor) {
+    var hang = [], floor = [];
+    var hangCount = Math.max(4, Math.min(14, Math.round(innerWidth / 130)));
+    for (var i = 0; i < hangCount; i++) {
+      var h = document.createElement("span");
+      h.className = "ef-hang";
+      h.style.setProperty("--x", ((i + 0.5) / hangCount * 100 + rand(-2, 2)).toFixed(2) + "vw");
+      h.style.setProperty("--len", rand(10, 34).toFixed(0) + "px");
+      h.style.setProperty("--d", rand(2.6, 4.2).toFixed(2) + "s");
+      h.style.setProperty("--delay", (-rand(0, 4)).toFixed(2) + "s");
+      h.appendChild(diya());
+      layer.appendChild(h);
+      hang.push(h);
+    }
+    // Floor diyas sit in the page's empty edges: left and right gutters at a few heights.
+    (withFloor ? [[0.035, 0.32], [0.955, 0.42], [0.04, 0.62], [0.95, 0.72], [0.035, 0.88], [0.955, 0.9]] : []).forEach(function (spot) {
+      var f = diya();
+      f.classList.add("ef-floor");
+      f.style.left = "calc(" + (spot[0] * 100) + "vw - 15px)";
+      f.style.top = (spot[1] * 100) + "vh";
+      layer.appendChild(f);
+      floor.push(f);
+    });
+    var check = function () {
+      hang.concat(floor).forEach(function (el) {
+        var target = el.classList.contains("ef-hang") ? el.querySelector(".ef-diya") : el;
+        var b = target.getBoundingClientRect();
+        // Include the flame and its glow above the bowl.
+        el.classList.toggle("ef-off", !isEmptyArea(b.left - 6, b.top - 20, b.width + 12, b.height + 24));
+      });
+    };
+    var timer = 0;
+    var schedule = function () { clearTimeout(timer); timer = setTimeout(check, 140); };
+    addEventListener("scroll", schedule, { passive: true });
+    addEventListener("resize", schedule);
+    setTimeout(check, 60);
+    setTimeout(check, 1200); // after late layout (fonts, images)
+    return function () { removeEventListener("scroll", schedule); removeEventListener("resize", schedule); floor.forEach(function (f) { f.remove(); }); };
+  }
+
+  function mountTrail(layer, colors) {
+    if (!matchMedia("(pointer: fine)").matches || matchMedia("(prefers-reduced-motion: reduce)").matches || !Element.prototype.animate) return function () {};
+    var pool = [], next = 0, lastX = -99, lastY = -99, lastT = 0;
+    for (var i = 0; i < 22; i++) {
+      var s = document.createElement("i");
+      s.className = "ef-spark";
+      s.style.setProperty("--c", colors[i % colors.length]);
+      layer.appendChild(s);
+      pool.push(s);
+    }
+    var fire = function (x, y, dx, dy, duration, scale) {
+      var s = pool[next++ % pool.length];
+      s.animate([
+        { transform: "translate3d(" + x + "px," + y + "px,0) scale(" + scale + ")", opacity: 1 },
+        { transform: "translate3d(" + (x + dx) + "px," + (y + dy) + "px,0) scale(.15) rotate(120deg)", opacity: 0 }
+      ], { duration: duration, easing: "cubic-bezier(.2,.7,.3,1)" });
+    };
+    var onMove = function (e) {
+      if (e.pointerType && e.pointerType !== "mouse" && e.pointerType !== "pen") return;
+      var now = performance.now();
+      if (now - lastT < 28 || Math.abs(e.clientX - lastX) + Math.abs(e.clientY - lastY) < 7) return;
+      lastT = now; lastX = e.clientX; lastY = e.clientY;
+      fire(e.clientX, e.clientY, rand(-10, 10), rand(8, 22), 560, rand(0.7, 1));
+    };
+    var onDown = function (e) {
+      if (e.pointerType && e.pointerType !== "mouse" && e.pointerType !== "pen") return;
+      for (var k = 0; k < 9; k++) {
+        var a = (k / 9) * Math.PI * 2 + rand(-0.2, 0.2), r = rand(26, 46);
+        fire(e.clientX, e.clientY, Math.cos(a) * r, Math.sin(a) * r, 720, 1.15);
+      }
+    };
+    addEventListener("pointermove", onMove, { passive: true });
+    addEventListener("pointerdown", onDown, { passive: true });
+    document.documentElement.classList.add("ef-cursor");
+    return function () {
+      removeEventListener("pointermove", onMove);
+      removeEventListener("pointerdown", onDown);
+      document.documentElement.classList.remove("ef-cursor");
+      pool.forEach(function (s) { s.remove(); });
+    };
+  }
+
   function mount(active) {
-    var theme = THEMES[active.id];
+    var base = THEMES[active.id], theme = {};
+    for (var k in base) theme[k] = base[k];
+    if (isCanary && base.canary) for (var c in base.canary) theme[c] = base.canary[c];
     var root = document.documentElement;
     var dismissKey = "elixpo-festive-dismissed:" + active.id + ":" + todayIso().slice(0, 4);
     var dismissed = store.get(dismissKey) === "1";
@@ -133,7 +269,10 @@
     layer.id = "elixpo-festive";
     layer.setAttribute("aria-hidden", "true");
     layer.innerHTML = '<div class="ef-glow"></div>' + (theme.garland ? '<div class="ef-garland ' + theme.garland + '"></div>' : "");
-    if (!dismissed) {
+    var cleanups = [];
+    if (theme.diyas) cleanups.push(mountDiyas(layer, !dismissed));
+    if (!dismissed && theme.trail) cleanups.push(mountTrail(layer, theme.colors));
+    if (!dismissed && theme.particle) {
       var kind = PARTICLES[theme.particle];
       var count = window.matchMedia("(max-width: 640px)").matches ? 7 : 14;
       for (var i = 0; i < count; i++) {
@@ -164,6 +303,7 @@
         store.set(dismissKey, "1");
         badge.remove();
         layer.querySelectorAll(".ef-p").forEach(function (p) { p.remove(); });
+        cleanups.forEach(function (stop) { stop(); });
       });
       badge.appendChild(close);
       document.body.appendChild(badge);

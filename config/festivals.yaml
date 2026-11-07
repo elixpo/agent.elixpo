@@ -31,6 +31,12 @@ services:
   - mail.elixpo.com
   - me.elixpo.com
 
+# Hosts that get new theme designs first (currently the Diwali diyas, toran, and sparkle
+# cursor). Add the other services here once the design is approved; preview it anywhere
+# with ?festive-canary=1.
+canary:
+  - elixpo.com
+
 festivals:
   - id: new-year
     name: New Year
