@@ -28,6 +28,10 @@ past its last day (default 3). Seasons fill the gaps.
 
 - `override: diwali` forces one theme everywhere; `override: none` turns all themes off.
 - Removing a host from `services` turns themes off for that site only.
+- `exclude_paths` lists routes per host that never show a theme, such as sketch's canvas
+  (`/c/*`, `/room/*`, `/s/*`) and the blogs editor (`/edit/*`, `/new-blog`). Globs; `*` matches
+  anything. Client-side navigation into or out of these routes switches the theme off and on.
+- `canary` lists hosts that get a theme's next design first.
 - `?festive=<id>` previews a theme on any page; `?festive=off` hides it.
 - Visitors can dismiss the greeting, which also stops the particles for that festival.
 

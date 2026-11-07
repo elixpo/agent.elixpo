@@ -36,6 +36,17 @@ services:
 canary:
   - elixpo.com
 
+# Routes that never show a theme, per host: work surfaces such as canvases and editors.
+# Globs; * matches anything, including "/".
+exclude_paths:
+  sketch.elixpo.com:
+    - /c/*
+    - /room/*
+    - /s/*
+  blogs.elixpo.com:
+    - /edit/*
+    - /new-blog
+
 festivals:
   - id: new-year
     name: New Year
