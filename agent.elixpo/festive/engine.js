@@ -56,7 +56,9 @@
   var host = location.hostname.replace(/^www\./, "");
   var canaryPreview = false;
   try { canaryPreview = new URLSearchParams(location.search).get("festive-canary") === "1"; } catch (e) { /* no URL API */ }
-  var isCanary = canaryPreview || (CALENDAR.canary || []).indexOf(host) !== -1;
+  var isLocal = host === "localhost" || host === "127.0.0.1";
+  // Local development always previews the newest designs.
+  var isCanary = canaryPreview || isLocal || (CALENDAR.canary || []).indexOf(host) !== -1;
 
   function pick() {
     var param = null;
@@ -67,8 +69,7 @@
       var known = CALENDAR.festivals.concat(CALENDAR.seasons || []).filter(function (f) { return f.id === forced; })[0] || {};
       return { id: forced, name: known.name || forced, greeting: known.greeting || null, festival: !!known.greeting };
     }
-    var local = host === "localhost" || host === "127.0.0.1";
-    if (!local && CALENDAR.services.indexOf(host) === -1) return null;
+    if (!isLocal && CALENDAR.services.indexOf(host) === -1) return null;
     return resolve(todayIso());
   }
 
