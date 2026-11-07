@@ -21,6 +21,13 @@ try { new Intl.DateTimeFormat("en-CA", { timeZone: calendar.timezone }); } catch
 if (!Number.isInteger(calendar?.defaults?.before) || !Number.isInteger(calendar?.defaults?.after)) fail("defaults.before and defaults.after must be integers");
 if (!Array.isArray(calendar?.services) || calendar.services.length === 0) fail("services must list at least one host");
 if (calendar?.canary != null && (!Array.isArray(calendar.canary) || calendar.canary.some((host) => !calendar.services?.includes(host)))) fail("canary must list hosts that are also in services");
+if (calendar?.exclude_paths != null) {
+  if (typeof calendar.exclude_paths !== "object" || Array.isArray(calendar.exclude_paths)) fail("exclude_paths must map hosts to lists of paths");
+  else for (const [host, paths] of Object.entries(calendar.exclude_paths)) {
+    if (!calendar.services?.includes(host)) fail(`exclude_paths: ${host} is not in services`);
+    if (!Array.isArray(paths) || paths.some((p) => typeof p !== "string" || !p.startsWith("/"))) fail(`exclude_paths: ${host} must list paths starting with "/"`);
+  }
+}
 if (calendar?.override != null && calendar.override !== "none" && !THEMES.includes(calendar.override)) fail(`override must be null, "none", or one of: ${THEMES.join(", ")}`);
 
 const ids = new Set();
@@ -52,7 +59,7 @@ if (problems.length) {
   process.exit(1);
 }
 
-const payload = { timezone: calendar.timezone, defaults: calendar.defaults, override: calendar.override ?? null, services: calendar.services, canary: calendar.canary ?? [], festivals, seasons };
+const payload = { timezone: calendar.timezone, defaults: calendar.defaults, override: calendar.override ?? null, services: calendar.services, canary: calendar.canary ?? [], exclude_paths: calendar.exclude_paths ?? {}, festivals, seasons };
 const out = join(site, "public", "festive", "theme.js");
 mkdirSync(dirname(out), { recursive: true });
 writeFileSync(out, engine.replace("/*__ELIXPO_FESTIVE_CALENDAR__*/ null", JSON.stringify(payload)));

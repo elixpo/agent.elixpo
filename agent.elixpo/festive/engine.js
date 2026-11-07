@@ -63,6 +63,32 @@
   // Local development always previews the newest designs.
   var isCanary = canaryPreview || isLocal || (CALENDAR.canary || []).indexOf(host) !== -1;
 
+  var isOff = function () { return document.documentElement.hasAttribute("data-elixpo-festive-off"); };
+
+  /** Routes listed under exclude_paths for this host (globs, * matches anything) never show a theme. */
+  function excludedRoute() {
+    var list = (CALENDAR.exclude_paths || {})[host] || [];
+    var path = location.pathname;
+    return list.some(function (glob) {
+      return new RegExp("^" + glob.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*") + "$").test(path);
+    });
+  }
+
+  /** Applies the exclusion now and on every client-side navigation (pushState, replaceState, back/forward). */
+  function watchRoutes() {
+    var sync = function () {
+      var off = excludedRoute();
+      document.documentElement.toggleAttribute("data-elixpo-festive-off", off);
+      if (!off) dispatchEvent(new Event("resize")); // re-check empty-space diyas on the new page
+    };
+    ["pushState", "replaceState"].forEach(function (name) {
+      var original = history[name];
+      history[name] = function () { var result = original.apply(this, arguments); setTimeout(sync, 0); return result; };
+    });
+    addEventListener("popstate", sync);
+    sync();
+  }
+
   function pick() {
     var param = null;
     try { param = new URLSearchParams(location.search).get("festive"); } catch (e) { /* no URL API */ }
@@ -115,14 +141,16 @@
     "#elixpo-festive .ef-hang::before{content:'';position:absolute;left:50%;top:0;width:1px;height:100%;background:linear-gradient(#9c5518,#e8a33d)}",
     "#elixpo-festive .ef-hang .ef-diya{left:0;top:calc(100% + 13px)}",
     "#elixpo-festive-tint{position:fixed;inset:0;z-index:9989;pointer-events:none;contain:strict;background:radial-gradient(ellipse 55% 45% at 0 0,var(--ef-t0),transparent 70%),radial-gradient(ellipse 55% 45% at 100% 0,var(--ef-t1),transparent 70%),radial-gradient(ellipse 60% 50% at 0 100%,var(--ef-t2),transparent 70%),radial-gradient(ellipse 60% 50% at 100% 100%,var(--ef-t0),transparent 70%),linear-gradient(var(--ef-t3),var(--ef-t3))}",
-    "html[data-elixpo-festive-offset] body{padding-top:calc(var(--ef-body-pad,0px) + var(--ef-top-offset))}",
+    "html[data-elixpo-festive-offset] body{padding-top:calc(var(--ef-body-pad,0px) + var(--ef-shift,0px))}",
+    "html[data-elixpo-festive-off]{--ef-shift:0px!important}",
+    "html[data-elixpo-festive-off] #elixpo-festive,html[data-elixpo-festive-off] #elixpo-festive-bg,html[data-elixpo-festive-off] #elixpo-festive-tint,html[data-elixpo-festive-off] .ef-badge{display:none!important}",
     "#elixpo-festive-bg{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;contain:strict;background:radial-gradient(ellipse 90% 55% at 50% 115%,rgba(255,160,50,.11),transparent 70%)}",
     "#elixpo-festive-bg .ef-diya{opacity:var(--o);transform:scale(var(--k));transform-origin:50% 100%;--glow:110px}",
     "#elixpo-festive-bg .ef-diya::after{background:radial-gradient(circle,rgba(255,176,64,.55),transparent 62%)}",
     "#elixpo-festive-bg .ef-flame{animation-duration:.6s}",
     "#elixpo-festive .ef-off{opacity:0}",
     "#elixpo-festive .ef-spark{position:absolute;left:0;top:0;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;background:radial-gradient(circle,#fff6d5 0 25%,var(--c) 60%);clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);opacity:0;will-change:transform,opacity}",
-    "html.ef-cursor,html.ef-cursor body{cursor:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12 1l2.6 8.4L23 12l-8.4 2.6L12 23l-2.6-8.4L1 12l8.4-2.6z' fill='%23ffc94d' stroke='%23893101' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E\") 12 12,auto}",
+    "html.ef-cursor:not([data-elixpo-festive-off]),html.ef-cursor:not([data-elixpo-festive-off]) body{cursor:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12 1l2.6 8.4L23 12l-8.4 2.6L12 23l-2.6-8.4L1 12l8.4-2.6z' fill='%23ffc94d' stroke='%23893101' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E\") 12 12,auto}",
     "@keyframes ef-flicker{from{transform:scale(1,1) rotate(-2deg)}to{transform:scale(.9,1.13) rotate(2deg)}}",
     "@keyframes ef-pool{from{opacity:.65;transform:scale(.92)}to{opacity:1;transform:scale(1.06)}}",
     "@keyframes ef-sway{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}",
@@ -189,6 +217,7 @@
       hang.push(h);
     }
     var check = function () {
+      if (isOff()) return;
       hang.forEach(function (el) {
         var b = el.querySelector(".ef-diya").getBoundingClientRect();
         // Include the flame and its glow above the bowl.
@@ -245,6 +274,7 @@
       ], { duration: duration, easing: "cubic-bezier(.2,.7,.3,1)" });
     };
     var onMove = function (e) {
+      if (isOff()) return;
       if (e.pointerType && e.pointerType !== "mouse" && e.pointerType !== "pen") return;
       var now = performance.now();
       if (now - lastT < 28 || Math.abs(e.clientX - lastX) + Math.abs(e.clientY - lastY) < 7) return;
@@ -252,6 +282,7 @@
       fire(e.clientX, e.clientY, rand(-10, 10), rand(8, 22), 560, rand(0.7, 1));
     };
     var onDown = function (e) {
+      if (isOff()) return;
       if (e.pointerType && e.pointerType !== "mouse" && e.pointerType !== "pen") return;
       for (var k = 0; k < 9; k++) {
         var a = (k / 9) * Math.PI * 2 + rand(-0.2, 0.2), r = rand(26, 46);
@@ -288,7 +319,7 @@
   function mountTopOffset(px) {
     var root = document.documentElement;
     root.style.setProperty("--ef-body-pad", getComputedStyle(document.body).paddingTop);
-    root.style.setProperty("--ef-top-offset", px + "px");
+    root.style.setProperty("--ef-shift", px + "px");
     root.setAttribute("data-elixpo-festive-offset", "");
     var shift = function () {
       var els = document.body.getElementsByTagName("*");
@@ -300,8 +331,8 @@
         var b = el.getBoundingClientRect();
         if (b.top > 48 || b.height > 180 || b.width < innerWidth * 0.4) continue;
         el.setAttribute("data-ef-shifted", "");
-        if (style.position === "fixed") el.style.translate = "0 " + px + "px";
-        else el.style.top = "calc(" + style.top + " + " + px + "px)";
+        if (style.position === "fixed") el.style.translate = "0 var(--ef-shift, 0px)";
+        else el.style.top = "calc(" + style.top + " + var(--ef-shift, 0px))";
       }
     };
     shift();
@@ -380,6 +411,7 @@
   }
 
   var active = pick();
+  if (active && THEMES[active.id]) watchRoutes();
   window.ElixpoFestive = { active: active, calendar: CALENDAR, resolve: resolve };
   if (!active || !THEMES[active.id]) return;
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { mount(active); });
