@@ -12,10 +12,10 @@
   var THEMES = {
     // A theme may carry a `canary` override: the next design, served first to hosts listed under
     // `canary` in festivals.yaml (and on localhost) before it replaces the default.
+    // The site's top bar moves below the toran (topOffset), hanging diyas stay inside that band,
+    // and the festival colours wash faintly over the whole page.
     "diwali": { accent: "#f59e0b", colors: ["#ffb347", "#ff7a1a", "#ffd166", "#e85d04"], particle: null, garland: "toran", diyas: true, trail: true,
-      // Next design (canary hosts only): the top bar moves below the toran, hanging diyas stay
-      // inside that band, and the festival colours wash faintly over the whole page.
-      canary: { topOffset: 58, hangLen: [4, 10], tint: true } },
+      topOffset: 70, hangLen: [4, 12], tint: true },
     "holi": { accent: "#ec4899", colors: ["#ff4d9d", "#4dabff", "#ffd23f", "#3ddc84", "#a259ff"], particle: "powder", garland: "bunting" },
     "independence-day": { accent: "#ff9933", colors: ["#ff9933", "#ffffff", "#138808", "#000080"], particle: "confetti", garland: "bunting" },
     "republic-day": { accent: "#138808", colors: ["#ff9933", "#ffffff", "#138808", "#000080"], particle: "confetti", garland: "bunting" },
