@@ -10,9 +10,9 @@
   if (!CALENDAR || window.ElixpoFestive) return;
 
   var THEMES = {
-    // `canary` is the next design, served first to hosts listed under `canary` in festivals.yaml.
-    "diwali": { accent: "#f59e0b", colors: ["#ffb347", "#ff7a1a", "#ffd166", "#e85d04"], particle: "ember", garland: "lights",
-      canary: { particle: null, garland: "toran", diyas: true, trail: true } },
+    // A theme may carry a `canary` override: the next design, served first to hosts listed under
+    // `canary` in festivals.yaml (and on localhost) before it replaces the default.
+    "diwali": { accent: "#f59e0b", colors: ["#ffb347", "#ff7a1a", "#ffd166", "#e85d04"], particle: null, garland: "toran", diyas: true, trail: true },
     "holi": { accent: "#ec4899", colors: ["#ff4d9d", "#4dabff", "#ffd23f", "#3ddc84", "#a259ff"], particle: "powder", garland: "bunting" },
     "independence-day": { accent: "#ff9933", colors: ["#ff9933", "#ffffff", "#138808", "#000080"], particle: "confetti", garland: "bunting" },
     "republic-day": { accent: "#138808", colors: ["#ff9933", "#ffffff", "#138808", "#000080"], particle: "confetti", garland: "bunting" },
