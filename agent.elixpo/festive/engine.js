@@ -104,22 +104,25 @@
     "@keyframes ef-in{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}",
     "html[data-elixpo-festive] ::selection{background:var(--ef-accent-soft-strong)}",
     "#elixpo-festive .ef-garland.toran{height:22px;background:radial-gradient(ellipse 4px 7px at 8px 17px,#2d6a4f 0 98%,transparent 100%) 4px 0/48px 26px,radial-gradient(circle at 8px 9px,#ff9f1c 0 6px,transparent 6.5px) 0 0/16px 22px,radial-gradient(circle at 8px 9px,#ffd166 0 6px,transparent 6.5px) 8px 4px/16px 22px;filter:drop-shadow(0 2px 2px rgba(120,40,0,.25))}",
-    "#elixpo-festive .ef-diya{position:absolute;width:30px;height:14px;transition:opacity .35s}",
-    "#elixpo-festive .ef-diya::before{content:'';position:absolute;inset:0;border-radius:0 0 50% 50%/0 0 100% 100%;background:linear-gradient(180deg,#f48c06,#9d0208);box-shadow:inset 0 2px 0 #ffba08}",
-    "#elixpo-festive .ef-diya::after{content:'';position:absolute;left:50%;bottom:4px;width:64px;height:64px;margin-left:-32px;border-radius:50%;background:radial-gradient(circle,rgba(255,186,80,.42),transparent 65%);animation:ef-pool 2.4s ease-in-out infinite alternate}",
-    "#elixpo-festive .ef-flame{position:absolute;left:50%;bottom:calc(100% - 3px);width:9px;height:15px;margin-left:-4.5px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:radial-gradient(ellipse at 50% 75%,#fffbe0 0 22%,#ffd166 42%,#ff8c1a 72%,rgba(255,120,0,0) 74%);transform-origin:50% 100%;animation:ef-flicker .19s ease-in-out var(--fd,0s) infinite alternate}",
+    ".ef-diya{position:absolute;width:30px;height:14px;transition:opacity .35s}",
+    ".ef-diya::before{content:'';position:absolute;inset:0;border-radius:0 0 50% 50%/0 0 100% 100%;background:linear-gradient(180deg,#f48c06,#9d0208);box-shadow:inset 0 2px 0 #ffba08}",
+    ".ef-diya::after{content:'';position:absolute;left:50%;bottom:calc(20px - var(--glow,64px)/2);width:var(--glow,64px);height:var(--glow,64px);margin-left:calc(var(--glow,64px)/-2);border-radius:50%;background:radial-gradient(circle,rgba(255,186,80,.42),transparent 65%);animation:ef-pool 2.4s ease-in-out infinite alternate}",
+    ".ef-flame{position:absolute;left:50%;bottom:calc(100% - 3px);width:9px;height:15px;margin-left:-4.5px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:radial-gradient(ellipse at 50% 75%,#fffbe0 0 22%,#ffd166 42%,#ff8c1a 72%,rgba(255,120,0,0) 74%);transform-origin:50% 100%;animation:ef-flicker .19s ease-in-out var(--fd,0s) infinite alternate}",
     "#elixpo-festive .ef-hang{position:absolute;top:14px;left:var(--x);width:30px;height:var(--len);transform-origin:50% 0;animation:ef-sway var(--d) ease-in-out var(--delay) infinite alternate;transition:opacity .35s}",
     "#elixpo-festive .ef-hang::before{content:'';position:absolute;left:50%;top:0;width:1px;height:100%;background:linear-gradient(#9c5518,#e8a33d)}",
     "#elixpo-festive .ef-hang .ef-diya{left:0;top:calc(100% + 13px)}",
-    "#elixpo-festive .ef-floor{transform:scale(1.25);transform-origin:50% 100%}",
+    "#elixpo-festive-bg{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;contain:strict;background:radial-gradient(ellipse 90% 55% at 50% 115%,rgba(255,160,50,.11),transparent 70%)}",
+    "#elixpo-festive-bg .ef-diya{opacity:var(--o);transform:scale(var(--k));transform-origin:50% 100%;--glow:110px}",
+    "#elixpo-festive-bg .ef-diya::after{background:radial-gradient(circle,rgba(255,176,64,.55),transparent 62%)}",
+    "#elixpo-festive-bg .ef-flame{animation-duration:.6s}",
     "#elixpo-festive .ef-off{opacity:0}",
     "#elixpo-festive .ef-spark{position:absolute;left:0;top:0;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;background:radial-gradient(circle,#fff6d5 0 25%,var(--c) 60%);clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);opacity:0;will-change:transform,opacity}",
     "html.ef-cursor,html.ef-cursor body{cursor:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12 1l2.6 8.4L23 12l-8.4 2.6L12 23l-2.6-8.4L1 12l8.4-2.6z' fill='%23ffc94d' stroke='%23893101' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E\") 12 12,auto}",
     "@keyframes ef-flicker{from{transform:scale(1,1) rotate(-2deg)}to{transform:scale(.9,1.13) rotate(2deg)}}",
     "@keyframes ef-pool{from{opacity:.65;transform:scale(.92)}to{opacity:1;transform:scale(1.06)}}",
     "@keyframes ef-sway{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}",
-    "@media (prefers-reduced-motion:reduce){#elixpo-festive .ef-p,#elixpo-festive .ef-spark{display:none}#elixpo-festive .ef-garland::after,#elixpo-festive .ef-flame,#elixpo-festive .ef-hang,#elixpo-festive .ef-diya::after,.ef-badge{animation:none}}",
-    "@media print{#elixpo-festive,.ef-badge{display:none}}"
+    "@media (prefers-reduced-motion:reduce){#elixpo-festive .ef-p,#elixpo-festive .ef-spark{display:none}#elixpo-festive .ef-garland::after,.ef-flame,#elixpo-festive .ef-hang,.ef-diya::after,.ef-badge{animation:none}}",
+    "@media print{#elixpo-festive,#elixpo-festive-bg,.ef-badge{display:none}}"
   ].join("");
 
   var PARTICLES = {
@@ -166,8 +169,8 @@
     return d;
   }
 
-  function mountDiyas(layer, withFloor) {
-    var hang = [], floor = [];
+  function mountDiyas(layer) {
+    var hang = [];
     var hangCount = Math.max(4, Math.min(14, Math.round(innerWidth / 130)));
     for (var i = 0; i < hangCount; i++) {
       var h = document.createElement("span");
@@ -180,19 +183,9 @@
       layer.appendChild(h);
       hang.push(h);
     }
-    // Floor diyas sit in the page's empty edges: left and right gutters at a few heights.
-    (withFloor ? [[0.035, 0.32], [0.955, 0.42], [0.04, 0.62], [0.95, 0.72], [0.035, 0.88], [0.955, 0.9]] : []).forEach(function (spot) {
-      var f = diya();
-      f.classList.add("ef-floor");
-      f.style.left = "calc(" + (spot[0] * 100) + "vw - 15px)";
-      f.style.top = (spot[1] * 100) + "vh";
-      layer.appendChild(f);
-      floor.push(f);
-    });
     var check = function () {
-      hang.concat(floor).forEach(function (el) {
-        var target = el.classList.contains("ef-hang") ? el.querySelector(".ef-diya") : el;
-        var b = target.getBoundingClientRect();
+      hang.forEach(function (el) {
+        var b = el.querySelector(".ef-diya").getBoundingClientRect();
         // Include the flame and its glow above the bowl.
         el.classList.toggle("ef-off", !isEmptyArea(b.left - 6, b.top - 20, b.width + 12, b.height + 24));
       });
@@ -203,7 +196,28 @@
     addEventListener("resize", schedule);
     setTimeout(check, 60);
     setTimeout(check, 1200); // after late layout (fonts, images)
-    return function () { removeEventListener("scroll", schedule); removeEventListener("resize", schedule); floor.forEach(function (f) { f.remove(); }); };
+    return function () { removeEventListener("scroll", schedule); removeEventListener("resize", schedule); };
+  }
+
+  /** Faint diyas scattered behind the page; sections with their own background cover them. */
+  function mountBackdrop() {
+    var bg = document.createElement("div");
+    bg.id = "elixpo-festive-bg";
+    bg.setAttribute("aria-hidden", "true");
+    var cols = Math.max(3, Math.round(innerWidth / 280)), rows = Math.max(3, Math.round(innerHeight / 230));
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        if (Math.random() < 0.45) continue;
+        var d = diya();
+        d.style.left = ((c + rand(0.15, 0.85)) / cols * 100).toFixed(2) + "%";
+        d.style.top = ((r + rand(0.2, 0.85)) / rows * 100).toFixed(2) + "%";
+        d.style.setProperty("--o", rand(0.16, 0.3).toFixed(2));
+        d.style.setProperty("--k", rand(0.8, 1.35).toFixed(2));
+        bg.appendChild(d);
+      }
+    }
+    document.body.insertBefore(bg, document.body.firstChild);
+    return function () { bg.remove(); };
   }
 
   function mountTrail(layer, colors) {
@@ -271,7 +285,10 @@
     layer.setAttribute("aria-hidden", "true");
     layer.innerHTML = '<div class="ef-glow"></div>' + (theme.garland ? '<div class="ef-garland ' + theme.garland + '"></div>' : "");
     var cleanups = [];
-    if (theme.diyas) cleanups.push(mountDiyas(layer, !dismissed));
+    if (theme.diyas) {
+      cleanups.push(mountDiyas(layer));
+      if (!dismissed) cleanups.push(mountBackdrop());
+    }
     if (!dismissed && theme.trail) cleanups.push(mountTrail(layer, theme.colors));
     if (!dismissed && theme.particle) {
       var kind = PARTICLES[theme.particle];
