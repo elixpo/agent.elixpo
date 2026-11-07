@@ -45,7 +45,19 @@ on:
         type: string
         default: .env.local
       secret-keys:
-        description: Space-separated keys from the decrypted env to sync as Worker secrets, or "all"
+        description: Space-separated keys or globs from the decrypted env to sync as Worker secrets ("all" or * for every key)
+        type: string
+        default: ""
+      secret-exclude:
+        description: Space-separated keys or globs (e.g. NEXT_PUBLIC_*) left out of secret-keys; keys named exactly in secret-keys still sync
+        type: string
+        default: ""
+      secret-map:
+        description: Secrets synced under another name, one TARGET=SOURCE_KEY per line (value read from the decrypted env)
+        type: string
+        default: ""
+      secret-values:
+        description: Non-secret constants synced as runtime variables, one KEY=value per line
         type: string
         default: ""
       d1-database:
@@ -90,11 +102,15 @@ jobs:
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version: ${{ inputs.node-version }}
-          cache: npm
+          cache: ${{ hashFiles(format('{0}/package-lock.json', inputs.working-directory)) != '' && 'npm' || '' }}
           cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          if [ -f package-lock.json ]; then npm ci
+          elif [ -f package.json ]; then npm install --no-audit --no-fund
+          else echo "No package.json here; wrangler runs through npx."
+          fi
 
       - name: Decrypt environment
         if: inputs.sops-file != ''
@@ -125,24 +141,51 @@ jobs:
         run: bash -euo pipefail -c "$COMMAND"
 
       - name: Sync Worker secrets
-        if: inputs.secret-keys != '' && inputs.sops-file != ''
+        if: inputs.secret-values != '' || (inputs.sops-file != '' && (inputs.secret-keys != '' || inputs.secret-map != ''))
         env:
           KEYS: ${{ inputs.secret-keys }}
+          EXCLUDE: ${{ inputs.secret-exclude }}
+          MAP: ${{ inputs.secret-map }}
+          VALUES: ${{ inputs.secret-values }}
           SOPS_OUTPUT: ${{ inputs.sops-output }}
         run: |
-          node -e '
-            const fs = require("fs");
-            const wanted = process.env.KEYS.trim() === "all" ? null : new Set(process.env.KEYS.split(/\s+/));
-            const out = {};
+          cat > /tmp/build-secrets.cjs <<'JS'
+          const fs = require("fs");
+          const env = {};
+          if (process.env.SOPS_OUTPUT && fs.existsSync(process.env.SOPS_OUTPUT)) {
             for (const line of fs.readFileSync(process.env.SOPS_OUTPUT, "utf8").split("\n")) {
               const m = line.match(/^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/);
-              if (m && (!wanted || wanted.has(m[1])) && !m[1].startsWith("CLOUDFLARE_")) out[m[1]] = m[2].replace(/^"(.*)"$/, "$1");
+              if (m) env[m[1]] = m[2].replace(/^"(.*)"$/, "$1");
             }
-            fs.writeFileSync("/tmp/worker-secrets.json", JSON.stringify(out));
-            console.log(`syncing ${Object.keys(out).length} secret(s)`);
-          '
-          npx --yes wrangler secret bulk /tmp/worker-secrets.json ${WRANGLER_ENV:+--env "$WRANGLER_ENV"}
-          rm -f /tmp/worker-secrets.json
+          }
+          const words = (value) => (value || "").split(/\s+/).filter(Boolean);
+          const pattern = (glob) => new RegExp("^" + glob.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*") + "$");
+          const include = words(process.env.KEYS).map((k) => (k === "all" ? "*" : k));
+          const exclude = words(process.env.EXCLUDE);
+          const named = new Set(include.filter((k) => !k.includes("*")));
+          const out = {};
+          for (const [key, value] of Object.entries(env)) {
+            if (key.startsWith("CLOUDFLARE_") || !value) continue;
+            if (!include.some((p) => pattern(p).test(key))) continue;
+            if (!named.has(key) && exclude.some((p) => pattern(p).test(key))) continue;
+            out[key] = value;
+          }
+          for (const line of (process.env.MAP || "").split("\n").map((l) => l.trim()).filter(Boolean)) {
+            const m = line.match(/^([A-Za-z_][A-Za-z0-9_]*)=([A-Za-z_][A-Za-z0-9_]*)$/);
+            if (!m || !env[m[2]]) { console.error(`::error::secret-map entry "${line}" needs TARGET=SOURCE with a non-empty SOURCE in the decrypted env`); process.exit(1); }
+            out[m[1]] = env[m[2]];
+          }
+          for (const line of (process.env.VALUES || "").split("\n").map((l) => l.trim()).filter(Boolean)) {
+            const m = line.match(/^([A-Za-z_][A-Za-z0-9_]*)=(.+)$/);
+            if (!m) { console.error(`::error::secret-values entry "${line}" must be KEY=value`); process.exit(1); }
+            out[m[1]] = m[2];
+          }
+          fs.writeFileSync(process.argv[2], JSON.stringify(out));
+          console.log(`syncing ${Object.keys(out).length} secret(s): ${Object.keys(out).sort().join(", ")}`);
+          JS
+          node /tmp/build-secrets.cjs /tmp/runtime-secrets.json
+          npx --yes wrangler secret bulk /tmp/runtime-secrets.json ${WRANGLER_ENV:+--env "$WRANGLER_ENV"}
+          rm -f /tmp/runtime-secrets.json /tmp/build-secrets.cjs
 
       - name: Build
         if: inputs.build-command != ''
