@@ -153,6 +153,18 @@ jobs:
           COMMAND: ${{ inputs.pre-build-command }}
         run: bash -euo pipefail -c "$COMMAND"
 
+      - name: Ensure the Pages project exists
+        env:
+          PROJECT: ${{ inputs.project-name }}
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          if npx --yes wrangler pages project list | grep -qw -- "$PROJECT"; then
+            echo "Pages project $PROJECT exists."
+          else
+            npx --yes wrangler pages project create "$PROJECT" --production-branch "$BRANCH"
+            echo "Created Pages project \`$PROJECT\` (production branch \`$BRANCH\`); attach its custom domain in Cloudflare." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Sync Pages secrets
         if: inputs.secret-values != '' || (inputs.sops-file != '' && (inputs.secret-keys != '' || inputs.secret-map != ''))
         env:
