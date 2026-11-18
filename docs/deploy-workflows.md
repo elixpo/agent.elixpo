@@ -69,5 +69,5 @@ whose `ELIXPO_DASHBOARD_GITHUB_TOKEN` stays on the Worker and is never overwritt
 3. Already-automatic repositories (elixpo, research, me, accounts, blogs, lixrl, crumb, sketch)
    switch their deploy jobs to these workflows; their npm and VS Code jobs move to the publish
    workflows, called only where a repository ships one.
-4. Not covered here: oreo's site deploy shares `tools/deploy.py` with board flashing and must be split
+4. Not covered here: falera's site deploy shares `tools/deploy.py` with board flashing and must be split
    first; Kareixo deploys through Vercel and search.elixpo runs on a Docker host.
