@@ -3,7 +3,7 @@ name: Elixpoo v2 reusable pull request review
 on:
   workflow_call:
     secrets:
-      github_token:
+      agentic_token:
         required: true
       pollinations_key:
         required: true
@@ -29,6 +29,6 @@ jobs:
       - run: pip install -e .
       - name: Post one evidence-grounded COMMENT review
         env:
-          ELIXPOO_GITHUB_AGENTIC_TOKEN: ${{ secrets.github_token }}
+          ELIXPOO_GITHUB_AGENTIC_TOKEN: ${{ secrets.agentic_token }}
           ELIXPO_POLLINATIONS_API_KEY: ${{ secrets.pollinations_key }}
         run: python -m agents.elixpoo_v2 review
