@@ -12,6 +12,7 @@ from agents.elixpoo_v2.core import (
     contains_exact_mention,
     is_coding_request,
     permission_tier,
+    restrict_to_allowlists,
     review_marker,
     route_comment,
     sanitize_evidence,
@@ -212,3 +213,26 @@ async def test_project_upsert_skips_built_in_fields() -> None:
     assert [u["field"] for u in api.updates] == ["F_kind", "F_note"]
     assert api.updates[0]["value"] == {"singleSelectOptionId": "O_issue"}
     assert api.updates[1]["value"] == {"text": "backend"}
+
+
+def test_restrict_to_allowlists_drops_values_the_model_invented() -> None:
+    # plumlang/plumlang#108: the model blended the Status field option "ready"
+    # into a label, and triage failed instead of applying the valid labels.
+    labels = {"documentation", "area/infrastructure", "status/review"}
+    fields = {"status": {"triage", "ready"}, "area": {"infrastructure"}}
+    action = MetadataAction(
+        kind="labels",
+        response="Classified.",
+        add_labels=("documentation", "status/ready", "area/infrastructure"),
+        project_fields={"status": "ready", "area": "frontend"},
+    )
+    restricted, dropped = restrict_to_allowlists(action, labels=labels, fields=fields)
+    assert restricted.add_labels == ("documentation", "area/infrastructure")
+    assert restricted.project_fields == {"status": "ready"}
+    assert dropped == ["label status/ready", "field area=frontend"]
+    validate_allowlists(restricted, labels=labels, fields=fields)
+    with pytest.raises(ValueError):
+        validate_allowlists(action, labels=labels, fields=fields)
+
+    clean, nothing = restrict_to_allowlists(restricted, labels=labels, fields=fields)
+    assert clean is restricted and nothing == []
