@@ -84,6 +84,10 @@ on:
         description: D1 database whose migrations are applied remotely before deploy
         type: string
         default: ""
+      wrangler-version:
+        description: Wrangler used when the directory has no locally installed wrangler (prebuilt mode, plain Worker folders)
+        type: string
+        default: "4.160.1"
       environment:
         description: GitHub environment that gates the deploy
         type: string
@@ -140,6 +144,19 @@ jobs:
           else echo "No package.json here; wrangler runs through npx."
           fi
 
+      - name: Resolve wrangler
+        env:
+          WRANGLER_VERSION: ${{ inputs.wrangler-version }}
+        run: |
+          # Prefer the repository's locked wrangler; otherwise pin, never "latest".
+          if [ -x node_modules/.bin/wrangler ]; then
+            echo "WRANGLER=npx --no-install wrangler" >> "$GITHUB_ENV"
+            echo "Using the locked wrangler $(npx --no-install wrangler --version)."
+          else
+            echo "WRANGLER=npx --yes wrangler@$WRANGLER_VERSION" >> "$GITHUB_ENV"
+            echo "Using pinned wrangler $WRANGLER_VERSION."
+          fi
+
       - name: Decrypt environment
         if: inputs.sops-file != ''
         env:
@@ -173,10 +190,10 @@ jobs:
           PROJECT: ${{ inputs.project-name }}
           BRANCH: ${{ inputs.branch }}
         run: |
-          if npx --yes wrangler pages project list | grep -qw -- "$PROJECT"; then
+          if $WRANGLER pages project list | grep -qw -- "$PROJECT"; then
             echo "Pages project $PROJECT exists."
           else
-            npx --yes wrangler pages project create "$PROJECT" --production-branch "$BRANCH"
+            $WRANGLER pages project create "$PROJECT" --production-branch "$BRANCH"
             echo "Created Pages project \`$PROJECT\` (production branch \`$BRANCH\`); attach its custom domain in Cloudflare." >> "$GITHUB_STEP_SUMMARY"
           fi
 
@@ -225,7 +242,7 @@ jobs:
           console.log(`syncing ${Object.keys(out).length} secret(s): ${Object.keys(out).sort().join(", ")}`);
           JS
           node /tmp/build-secrets.cjs /tmp/runtime-secrets.json
-          npx --yes wrangler pages secret bulk /tmp/runtime-secrets.json --project-name "$PROJECT"
+          $WRANGLER pages secret bulk /tmp/runtime-secrets.json --project-name "$PROJECT"
           rm -f /tmp/runtime-secrets.json /tmp/build-secrets.cjs
 
       - name: Build
@@ -245,14 +262,14 @@ jobs:
         if: inputs.d1-database != ''
         env:
           DATABASE: ${{ inputs.d1-database }}
-        run: npx --yes wrangler d1 migrations apply "$DATABASE" --remote
+        run: $WRANGLER d1 migrations apply "$DATABASE" --remote
 
       - name: Deploy
         env:
           OUTPUT: ${{ inputs.output-directory }}
           PROJECT: ${{ inputs.project-name }}
           BRANCH: ${{ inputs.branch }}
-        run: npx --yes wrangler pages deploy "$OUTPUT" --project-name "$PROJECT" --branch "$BRANCH" --commit-hash "$GITHUB_SHA" --commit-dirty=true
+        run: $WRANGLER pages deploy "$OUTPUT" --project-name "$PROJECT" --branch "$BRANCH" --commit-hash "$GITHUB_SHA" --commit-dirty=true
 
       - name: Summary
         if: always()

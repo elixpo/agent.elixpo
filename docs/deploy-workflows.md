@@ -19,7 +19,11 @@ keys from it as runtime secrets, and apply D1 migrations (`d1-database`). Secret
 - `secret-map`: `TARGET=SOURCE` lines to sync a key under another name;
 - `secret-values`: `KEY=value` lines for non-secret constants such as a production URL.
 
-`CLOUDFLARE_*` keys are never synced as runtime secrets. Directories without a `package.json`
+`CLOUDFLARE_*` keys are never synced as runtime secrets.
+
+Wrangler is never taken from "latest": each job uses the repository's locked wrangler when the
+working directory has one installed, and otherwise the pinned `wrangler-version` input
+(default `4.160.1`). Bump the default deliberately, after a release has been out for a while. Directories without a `package.json`
 (plain Workers) skip the npm install and run wrangler through npx.
 
 ## Credentials
