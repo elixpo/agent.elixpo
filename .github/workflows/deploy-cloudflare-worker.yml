@@ -8,6 +8,11 @@
 #         working-directory: workers/api
 #       secrets: inherit
 #
+# Prebuilt mode: when a repository must build with its own privileged steps (signing release
+# artifacts, for example), it uploads the build output as a workflow artifact and passes
+# artifact-name and artifact-path; this workflow installs dependencies (for the pinned wrangler),
+# restores the output at artifact-path, and deploys it without building.
+#
 # Optional: build-command (e.g. `npx opennextjs-cloudflare build`), wrangler-env, sops-file +
 # secret-keys (synced with `wrangler secret bulk`), and d1-database migrations.
 
@@ -25,6 +30,14 @@ on:
         default: "22"
       build-command:
         description: Optional build before deploying (OpenNext, bundling)
+        type: string
+        default: ""
+      artifact-name:
+        description: Workflow artifact holding build output produced earlier in this run; deployed instead of building
+        type: string
+        default: ""
+      artifact-path:
+        description: Where to restore the artifact, relative to working-directory (for example .open-next)
         type: string
         default: ""
       wrangler-env:
@@ -104,6 +117,12 @@ jobs:
           node-version: ${{ inputs.node-version }}
           cache: ${{ hashFiles(format('{0}/package-lock.json', inputs.working-directory)) != '' && 'npm' || '' }}
           cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
+
+      - name: Check build inputs
+        if: (inputs.artifact-name != '' && (inputs.build-command != '' || inputs.artifact-path == '')) || (inputs.artifact-name == '' && inputs.artifact-path != '')
+        run: |
+          echo "::error::Use artifact-name together with artifact-path, and without build-command."
+          exit 1
 
       - name: Install dependencies
         run: |
@@ -186,6 +205,13 @@ jobs:
           node /tmp/build-secrets.cjs /tmp/runtime-secrets.json
           npx --yes wrangler secret bulk /tmp/runtime-secrets.json ${WRANGLER_ENV:+--env "$WRANGLER_ENV"}
           rm -f /tmp/runtime-secrets.json /tmp/build-secrets.cjs
+
+      - name: Download prebuilt output
+        if: inputs.artifact-name != ''
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.working-directory }}/${{ inputs.artifact-path }}
 
       - name: Build
         if: inputs.build-command != ''
