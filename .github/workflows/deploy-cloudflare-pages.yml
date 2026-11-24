@@ -10,6 +10,10 @@
 #         output-directory: out
 #       secrets: inherit
 #
+# Prebuilt mode: when a repository must build with its own privileged steps (package signing,
+# for example), it uploads the finished site as a workflow artifact and passes artifact-name;
+# this workflow then deploys that artifact without installing or building.
+#
 # Optional: decrypt a sops-encrypted .env (sops-file), sync selected keys from it as Pages
 # secrets (secret-keys), apply D1 migrations (d1-database), and set public build variables
 # (build-env, one KEY=VALUE per line).
@@ -24,9 +28,13 @@ on:
         type: string
         required: true
       build-command:
-        description: Command that produces the deployable output
+        description: Command that produces the deployable output (omit when artifact-name is set)
         type: string
-        required: true
+        default: ""
+      artifact-name:
+        description: Workflow artifact holding a site built earlier in this run; deployed as-is instead of building
+        type: string
+        default: ""
       output-directory:
         description: Directory to upload, relative to working-directory
         type: string
@@ -118,7 +126,14 @@ jobs:
           cache: ${{ hashFiles(format('{0}/package-lock.json', inputs.working-directory)) != '' && 'npm' || '' }}
           cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
 
+      - name: Check build inputs
+        if: (inputs.build-command == '') == (inputs.artifact-name == '')
+        run: |
+          echo "::error::Set exactly one of build-command or artifact-name."
+          exit 1
+
       - name: Install dependencies
+        if: inputs.artifact-name == ''
         run: |
           if [ -f package-lock.json ]; then npm ci
           elif [ -f package.json ]; then npm install --no-audit --no-fund
@@ -214,9 +229,17 @@ jobs:
           rm -f /tmp/runtime-secrets.json /tmp/build-secrets.cjs
 
       - name: Build
+        if: inputs.artifact-name == ''
         env:
           COMMAND: ${{ inputs.build-command }}
         run: bash -euo pipefail -c "$COMMAND"
+
+      - name: Download prebuilt site
+        if: inputs.artifact-name != ''
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.working-directory }}/${{ inputs.output-directory }}
 
       - name: Apply D1 migrations
         if: inputs.d1-database != ''
