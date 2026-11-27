@@ -31,9 +31,12 @@
 
   var DAY = 86400000;
   var dayNumber = function (iso) { var p = iso.split("-").map(Number); return Date.UTC(p[0], p[1] - 1, p[2]) / DAY; };
-  var todayIso = function () {
-    try { return new Intl.DateTimeFormat("en-CA", { timeZone: CALENDAR.timezone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date()); }
-    catch (e) { return new Date().toISOString().slice(0, 10); }
+  // Birthdays switch on a minute early (23:59 the night before), so they are live at midnight.
+  var BIRTHDAY_LEAD_MS = 60 * 1000;
+  var todayIso = function (offsetMs) {
+    var now = new Date(Date.now() + (offsetMs || 0));
+    try { return new Intl.DateTimeFormat("en-CA", { timeZone: CALENDAR.timezone, year: "numeric", month: "2-digit", day: "2-digit" }).format(now); }
+    catch (e) { return now.toISOString().slice(0, 10); }
   };
 
   function occurrences(festival, year) {
@@ -48,8 +51,8 @@
     return { id: "birthday", name: "Birthday", greeting: "Happy birthday, " + joined + "!", festival: true, people: people, url: people[0].url };
   }
 
-  function resolve(iso) {
-    var birthdays = (CALENDAR.birthdays || []).filter(function (b) { return b.date === iso.slice(5); });
+  function resolve(iso, birthdayIso) {
+    var birthdays = (CALENDAR.birthdays || []).filter(function (b) { return b.date === (birthdayIso || iso).slice(5); });
     if (birthdays.length) return birthdayEvent(birthdays);
     var today = dayNumber(iso), year = Number(iso.slice(0, 4)), best = null;
     CALENDAR.festivals.forEach(function (festival) {
@@ -117,7 +120,7 @@
       return { id: forced, name: known.name || forced, greeting: known.greeting || null, festival: !!known.greeting };
     }
     if (!isLocal && CALENDAR.services.indexOf(host) === -1) return null;
-    return resolve(todayIso());
+    return resolve(todayIso(), todayIso(BIRTHDAY_LEAD_MS));
   }
 
   var store = {
@@ -488,6 +491,22 @@
   var active = pick();
   if (active && THEMES[active.id]) watchRoutes();
   window.ElixpoFestive = { active: active, calendar: CALENDAR, resolve: resolve };
+
+  // A page left open without a theme picks up a birthday the moment it starts (23:59 IST).
+  if ((!active || !THEMES[active.id]) && (CALENDAR.birthdays || []).length && CALENDAR.timezone === "Asia/Kolkata") {
+    var IST_OFFSET_MS = 5.5 * 3600 * 1000, DAY_MS = 86400000;
+    var untilStart = DAY_MS - ((Date.now() + IST_OFFSET_MS + BIRTHDAY_LEAD_MS) % DAY_MS);
+    var tomorrow = todayIso(BIRTHDAY_LEAD_MS + untilStart + 1000).slice(5);
+    var startsSoon = untilStart < 12 * 3600 * 1000 && CALENDAR.birthdays.some(function (b) { return b.date === tomorrow; });
+    if (startsSoon) setTimeout(function () {
+      var next = pick();
+      if (!next || next.id !== "birthday") return;
+      window.ElixpoFestive.active = next;
+      watchRoutes();
+      mount(next);
+    }, untilStart + 1000);
+  }
+
   if (!active || !THEMES[active.id]) return;
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { mount(active); });
   else mount(active);
